@@ -943,6 +943,7 @@ const TARGETS = {
 // NO las del query nuevo). Se usan en dos lugares: (1) Category Summary -- SOLO para el callout de reconciliación
 // bottom-up vs top-down (Heidy pidió explícitamente NO mostrar metas por aliado en Category Summary); (2) Ally
 // Deep-Dive -- tarjeta "Meta individual" por aliado (Change 2). [ally|oct_cop|nov_cop|dic_cop]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const ALLY_TARGETS_Q4_RAW = `pilatos-ecommerce|47950287|72396702|79636373
 tiendasbranchos-ecommerce|69129696|98091272|106870439
 bosi-ecommerce|100281699|172783683|184878541
@@ -976,6 +977,7 @@ const TARGETS_TOPDOWN_ORIGINAL = {Oct: TARGETS.belleza.monthly.Oct, Nov: TARGETS
 // Fuente: dm_originations_marketplace_master_table_by_suborder, SUM(suborder_amount_cop), ally_slug IN (los 14
 // con meta), CAST(origination_date_local AS DATE) entre 2026-10-01 y 2026-10-29 (mismo último día maduro que el resto del
 // dashboard). Deviación deliberada de marketplace_products_pa -- ver callout en t2MetaIndividualCard. [ally|gmv_mtd_cop]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const ALLY_FINANCE_MTD_RAW = `pilatos-ecommerce|14402580
 mariohdz-ecommerce|91672973
 prochampions-ecommerce|134553503
@@ -1047,6 +1049,7 @@ function parseDailyRaw(raw){
   }).sort((a,b)=>a[0].localeCompare(b[0]));
 }
 // [date, allies_selling] -- distinct ally_slug con venta Moda ese día.
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const DAILY_ALLIES_SELLING_RAW = `2026-07-02|104
 2026-07-03|85
 2026-07-04|101
@@ -1168,6 +1171,7 @@ const DAILY_ALLIES_SELLING_RAW = `2026-07-02|104
 2026-10-28|128
 2026-10-29|125`;
 // [date, gmv_cop_mp, orders_mp] -- Marketplace total, sin filtro de categoría.
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const DAILY_MP_RAW = `2026-07-02|1.82131681849E9|3699
 2026-07-03|1.60658024112E9|3093
 2026-07-04|1.73447334086E9|3480
@@ -1289,6 +1293,7 @@ const DAILY_MP_RAW = `2026-07-02|1.82131681849E9|3699
 2026-10-28|1.9085753368999996E9|4096
 2026-10-29|1.8201804241000001E9|3708`;
 // [date, suborders_cat, cancel_r28] -- ally_category IN ('Moda','Zapatos','Joyas y accesorios')
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const DAILY_CANCEL_RAW = `2026-07-02|634|22
 2026-07-03|546|13
 2026-07-04|674|16
@@ -1410,6 +1415,7 @@ const DAILY_CANCEL_RAW = `2026-07-02|634|22
 2026-10-28|932|2
 2026-10-29|850|2`;
 // [date, new_buyers_cat, new_mp_to_cat]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const DAILY_NEWBUYERS_RAW = `2026-07-02|343|206
 2026-07-03|302|163
 2026-07-04|373|210
@@ -1531,6 +1537,7 @@ const DAILY_NEWBUYERS_RAW = `2026-07-02|343|206
 2026-10-28|517|298
 2026-10-29|452|259`;
 // [date, skus_con_venta]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const DAILY_LISTINGS_SOLD_RAW = `2026-07-02|440
 2026-07-03|405
 2026-07-04|468
@@ -1745,6 +1752,7 @@ const L2L3_SALES = [
 // Solo incluye aliados que matchean un bucket (nuevo <=30d primera venta, O última venta >=28d atrás).
 // Pipe-CSV: ally|cluster|first_sale|last_sale|gmv_cop|orders|distinct_skus|days_since_last|days_since_first
 // cluster puede venir vacío (sin match en ally_cluster para ese ally_slug en el scope Moda).
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const ALLY_LIFECYCLE_CSV = `joyeriabreslestor-ecommerce|SMB|2024-11-29|2026-07-03|1.8810865435000002E8|74|13|118|699
 alpakashop-ecommerce|SMB|2025-09-10|2026-07-22|7.794317647E7|474|172|99|414
 carlosmarinjoyeria-ecommerce|SMB|2025-06-03|2026-01-27|5.86147E7|143|86|275|513
@@ -2085,6 +2093,7 @@ function parseWeeklyRaw(raw, nFields){
   }).sort((a,b)=>a[0].localeCompare(b[0]));
 }
 // [wk, gmv_cop, gmv_cop_dup(sin uso), orders, buyers, allies_selling, 0(sin uso)]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const WEEKLY_BEAUTY_1Y_RAW = `2025-09-01|1.7265183005E8|1.7265183005E8|993|974|122|0
 2025-09-08|1.4838923604E8|1.4838923604E8|881|870|117|0
 2025-09-15|1.5465788012E8|1.5465788012E8|924|910|120|0
@@ -2147,6 +2156,7 @@ const WEEKLY_BEAUTY_1Y_RAW = `2025-09-01|1.7265183005E8|1.7265183005E8|993|974|1
 2026-10-19|9.2430273514E8|9.2430273514E8|4096|3964|281|0
 2026-10-26|5.6598521772E8|5.6598521772E8|2527|2435|250|0`;
 // [wk, gmv_cop_mp, orders_mp, 0(sin uso)]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const WEEKLY_MP_1Y_RAW = `2025-09-01|7.69407822353E9|16291|0
 2025-09-08|6.98011213024E9|14834|0
 2025-09-15|8.92285445965E9|16825|0
@@ -2209,6 +2219,7 @@ const WEEKLY_MP_1Y_RAW = `2025-09-01|7.69407822353E9|16291|0
 2026-10-19|1.3913777344830006E10|26992|0
 2026-10-26|7.450407613709999E9|15348|0`;
 // [wk, new_buyers_cat, new_mp_to_cat]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const WEEKLY_NEWBUYERS_1Y_RAW = `2025-09-01|855|500
 2025-09-08|759|432
 2025-09-15|804|430
@@ -2273,6 +2284,7 @@ const WEEKLY_NEWBUYERS_1Y_RAW = `2025-09-01|855|500
 // [wk, suborders_cat, cancel_r28] -- TRIMMED a semanas maduras (>=28 días antes de 2026-10-26): último valor 2026-09-21.
 // SIN CAMBIO en el refresh 2026-10-29: con anchor 2026-10-28 la regla de madurez (wk+6+28<=anchor) sigue sin madurar
 // la semana 2026-09-28 (necesita anchor>=2026-11-01), así que el último valor maduro sigue siendo 2026-09-21.
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const WEEKLY_CANCEL_1Y_RAW = `2025-09-01|2519|60
 2025-09-08|2255|54
 2025-09-15|2579|83
@@ -2337,6 +2349,7 @@ const WEEKLY_CANCEL_1Y = parseWeeklyRaw(WEEKLY_CANCEL_1Y_RAW);
 // wk|intro_cop|cupo_cop|grande_cop|otro_cop (crudo, SIN reescalar -- se reescala en runtime al GMV real de WEEKLY_BEAUTY_1Y).
 // Fuente: addi_prod.gold.dm_originations_marketplace_suborders_co, application_synthetic_product_category,
 // scope suborder_ally_category IN ('Moda','Zapatos','Joyas y accesorios'), excluye MISSING_LOAN_PROPOSAL_PRODUCTV2.
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const WEEKLY_CREDIT_TYPE_RAW = `2025-09-01|2.1570052845E8|1.9901761368E8|1.9923754733E8|3290344.0
 2025-09-08|2.06392795451E8|1.7792680682E8|1.5809500229E8|2204989.8
 2025-09-15|2.4795899797E8|2.7175740553E8|1.0984715599E8|3829739.25
@@ -2399,6 +2412,7 @@ const WEEKLY_CREDIT_TYPE_RAW = `2025-09-01|2.1570052845E8|1.9901761368E8|1.99237
 2026-10-19|5.992909398699999E8|4.0548422563E8|1.1953742800000001E8|1.0169206E7
 2026-10-26|3.9061322442E8|2.2097342225000003E8|7.425752544E7|1.064989E7`;
 // [d, intro_cop, cupo_cop, grande_cop, otro_cop] -- diario (igual scope que arriba)
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const DAILY_CREDIT_TYPE_RAW = `2026-07-02|7.83578216E7|4.1155143E7|1.70956088E7|1961219.0
 2026-07-03|6.564001638E7|4.144758124E7|1.34859818E7|1612732.0
 2026-07-04|8.001161116E7|4.925539299E7|1.094567201E7|815628.0
@@ -2523,6 +2537,7 @@ const WEEKLY_CREDIT_TYPE = parseWeeklyRaw(WEEKLY_CREDIT_TYPE_RAW);
 const DAILY_CREDIT_TYPE = parseDailyRaw(DAILY_CREDIT_TYPE_RAW);
 
 // [wk, gmv_usd, mdf_usd, lead_gen_usd, mpf_usd, contribution_income_usd] -- aplicaciones Moda (ally_category)
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const WEEKLY_TAKERATE_RAW = `2025-09-01|209272.77777857144|9108.581228869043|0.0|22188.94104490475|23037.77835536967
 2025-09-08|178999.21330000006|7937.403314047619|0.0|18855.17303978569|19747.692177880712
 2025-09-15|217666.1548380953|9732.40283222619|0.0|22927.33224392857|29739.83209632925
@@ -2585,6 +2600,7 @@ const WEEKLY_TAKERATE_RAW = `2025-09-01|209272.77777857144|9108.581228869043|0.0
 2026-10-19|344410.0386571428|11543.615177550002|0.0|38053.55712854999|30061.162841039277
 2026-10-26|211054.4381142857|7137.365351278573|0.0|23324.436548045225|21012.027203486672`;
 // [d, gmv_usd, mdf_usd, lead_gen_usd, mpf_usd, contribution_income_usd] -- diario (mismo scope, con contribution income)
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const DAILY_TAKERATE2_RAW = `2026-07-02|41616.52506666666|1481.9911321952388|0.0|4508.859325190476|3379.6737261911926
 2026-07-03|34181.44726428571|1064.6294065761895|0.0|3899.2595158690474|2421.362428487588
 2026-07-04|41302.50523333332|1218.2839596000008|0.0|4654.949385357145|3268.104954326888
@@ -2710,6 +2726,7 @@ const DAILY_TAKERATE2 = parseDailyRaw(DAILY_TAKERATE2_RAW);
 
 // [wk, visitas(SELECT_PRODUCT usuarios únicos), atc(SELECT_ADD_TO_CART usuarios únicos)] -- Amplitude, proyecto
 // ADDI-FUNNEL (385311), departmentName IN ('Moda mujer','Moda hombre'). 83 semanas reales desde 2025-03-24.
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const WEEKLY_TRAFFIC_AMP_RAW = `2025-03-24|15962|6457
 2025-03-31|34058|6978
 2025-04-07|34516|6629
@@ -2794,6 +2811,7 @@ const WEEKLY_TRAFFIC_AMP_RAW = `2025-03-24|15962|6457
 2026-10-12|66354|13974
 2026-10-19|68704|13977
 2026-10-26|38509|8477`;
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const DAILY_TRAFFIC_AMP_RAW = `2026-07-02|10043|1796
 2026-07-03|8376|1562
 2026-07-04|9320|1738
@@ -2918,6 +2936,7 @@ const WEEKLY_TRAFFIC_AMP = parseWeeklyRaw(WEEKLY_TRAFFIC_AMP_RAW);
 const DAILY_TRAFFIC_AMP = parseDailyRaw(DAILY_TRAFFIC_AMP_RAW);
 
 // [wk, otro, falta_stock, retracto, otros_menores] -- razones de cancelación r28, scope Moda (ally_category)
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const WEEKLY_CANCEL_REASONS_RAW = `2025-09-01|36|9|10|5
 2025-09-08|31|1|17|5
 2025-09-15|62|9|6|6
@@ -2982,6 +3001,7 @@ const WEEKLY_CANCEL_REASONS_RAW = `2025-09-01|36|9|10|5
 const WEEKLY_CANCEL_REASONS = parseWeeklyRaw(WEEKLY_CANCEL_REASONS_RAW);
 
 // [wk, total, free_shipping_n, lba_n, free_and_lba_n] -- subórdenes Moda (bridge via suborder_vtex_external_id_array[0])
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const WEEKLY_FREE_SHIPPING_RAW = `2025-09-01|2519|202|0|0
 2025-09-08|2255|300|0|0
 2025-09-15|2579|392|0|0
@@ -3043,6 +3063,7 @@ const WEEKLY_FREE_SHIPPING_RAW = `2025-09-01|2519|202|0|0
 2026-10-12|5497|759|0|0
 2026-10-19|5269|886|0|0
 2026-10-26|3329|378|0|0`;
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const DAILY_FREE_SHIPPING_RAW = `2026-07-02|603|51|0|0
 2026-07-03|480|29|0|0
 2026-07-04|562|43|0|0
@@ -3169,6 +3190,7 @@ const DAILY_FREE_SHIPPING = parseDailyRaw(DAILY_FREE_SHIPPING_RAW);
 const WEEKLY_BEAUTY = WEEKLY_BEAUTY_1Y, WEEKLY_MP = WEEKLY_MP_1Y, WEEKLY_NEWBUYERS = WEEKLY_NEWBUYERS_1Y, WEEKLY_CANCEL = WEEKLY_CANCEL_1Y;
 
 // Top 5 aliados con más cancelaciones r28, últimos 3 meses maduros (2026-06-28 a 2026-09-28), scope Moda (ally_category).
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const CANCEL_TOP_ALLIES_CSV = `cuerosvelez-ecommerce|14137|383
 totto-ecommerce|13287|155
 dayoshop-ecommerce|2998|153
@@ -3177,6 +3199,7 @@ bata-ecommerce|1971|69`;
 
 // Ally Moda-GMV vs total-GMV-all-categories (lifetime) -- usado para filtrar "Salud de aliados" a aliados donde
 // Moda es genuinamente su negocio (>=60% de su GMV), no vendedores cruzados ocasionales. Mismo criterio que Beauty.
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const ALLY_CATEGORY_SHARE_CSV = `joyeriabreslestor-ecommerce|1.8810865435000002E8|2.0064536504999998E8
 alpakashop-ecommerce|7.794317647E7|2.3025317647E8
 carlosmarinjoyeria-ecommerce|5.86147E7|1.9063180659E8
@@ -4762,6 +4785,7 @@ const T2_CLUSTER = {'cuerosvelez-ecommerce':'KA','totto-ecommerce':'KA','kronoti
 
 // GMV 7d/MTD -- mismo método que ALLIES (tab 1), recalculado 2026-10-30 para los 27. g7=2026-10-23..10-29,
 // gp7=2026-10-16..10-22, gmtd=2026-10-01..10-29, glm=2026-09-01..09-30. [ally|g7_cop|gp7_cop|gmtd_cop|glm_cop|o7|op7]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const T2_GMV_RAW = `cuerosvelez-ecommerce|3.005875E8|2.6533246E8|1.09538216E9|9.602725E8|1198|965
 totto-ecommerce|1.4530115E8|1.3922525E8|4.8032315E8|3.253559E8|912|977
 kronotime-ecommerce|5.23027E7|4.52044E7|2.014442E8|1.322715E8|173|145
@@ -4792,6 +4816,7 @@ tiendasbranchos-ecommerce|6382600.0|4850860.0|2.179076E7|1.555392E7|25|22`;
 
 // Catálogo Moda del aliado, snapshot 2026-10-29 (silver_live.f_marketplace_catalog_sku_co, merchant_id=ally_slug, cruzado con taxonomía l1='Moda' vía sku_oms_id).
 // Disponible = sku_active AND offer_status='AVAILABLE'. [ally|n_moda_skus|n_available|n_free_ship_eligible|avg_price_cop]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const T2_CATALOG_RAW = `tennis-ecommerce|15444|9583|0|125442.0664983165
 frutafresca-ecommerce|14519|10130|0|402743.40657070046
 pilatos-ecommerce|14653|5158|179|486793.7555449396
@@ -4821,6 +4846,7 @@ ventasenlineacorpsas-ecommerce|541|470|0|274244.7874306839
 maeskoshop-ecommerce|182|147|0|307880.2197802198`;
 
 // Listings activos = SKUs Moda con sku_active=true (sin exigir vendible hoy), mismo snapshot. [ally|n_sku_active]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const T2_LISTINGS_ACTIVE_RAW = `bata-ecommerce|4357
 bosi-ecommerce|6740
 calzatodo-ecommerce|6260
@@ -4853,6 +4879,7 @@ wolker-ecommerce|576`;
 // Tiering por GMV histórico (180 días, marketplace_products_pa, l1='Moda'): tier 1 = SKUs que acumulan el primer 50% del GMV del
 // aliado (ordenados desc), tier 2 = tramo 50-80%, tier 3 = tramo 80-100%. n_available = disponibles HOY dentro del tier.
 // [ally|tier|n_skus|tier_gmv_cop|n_available]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const T2_TIER_RAW = `bata-ecommerce|1|156|1.2754949205E8|126
 bata-ecommerce|2|332|7.711165E7|247
 bata-ecommerce|3|498|5.1201115E7|392
@@ -4941,6 +4968,7 @@ wolker-ecommerce|3|132|4.11486E7|126`;
 // desc -- ampliado 2026-10-19 a pedido de Heidy (antes limitaba a 5). pct = GMV del SKU / GMV TOTAL del aliado
 // (los 3 tiers juntos, 180d), no solo del tier 1. Delimitador "~" porque el nombre de producto puede traer comas.
 // [ally~sku_id~product_name~gmv_cop_180d~pct_of_ally_total_gmv]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const T2_TIER1_DOWN_RAW = `bata-ecommerce~3969523~Tenis Para Mujer North Star Blanco Luisa Skater Wave~2370105.0~0.00926320680246653
 bata-ecommerce~5097665~Tenis Para Mujer North Star Beige Máximo Midas Casual~1484010.0~0.005800034819946101
 bata-ecommerce~5097671~Tenis Para Mujer North Star Beige Máximo Midas Casual~1289140.0~0.005038414086013785
@@ -5702,6 +5730,7 @@ ventasenlineacorpsas-ecommerce~3512860~Reloj Swatch Unisex SUSJ404~1554000.0~0.0
 // Solo 20 de 27 aliados tienen fila en esta tabla para este scope -- mismo gap ya documentado en tab 1 (son los 7 aliados con
 // cluster "—" en la tabla Top 25): pacificsportcolombia, peopleplays, prochampions, sportzone, ventasenlineacorpsas,
 // maeskoshop, wolker. [ally|suborders_ventana|cancel_r28]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const T2_CANCEL_RAW = `bata-ecommerce|2001|70
 bosi-ecommerce|504|3
 lecoqsportif-ecommerce|257|4
@@ -5730,6 +5759,7 @@ mariohdz-ecommerce|957|14`;
 // no tienen suborder_ally_category poblado como 'Moda'/'Zapatos'/'Joyas y accesorios' en esta tabla aunque sí
 // tienen ally_slug -- filtrar por categoría los dejaría fuera (mismo método que en el refresh original).
 // [ally|n_suborders|n_free_ship]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const T2_FREESHIP_RAW = `bata-ecommerce|763|0
 bosi-ecommerce|207|35
 calzatodo-ecommerce|258|56
@@ -5760,6 +5790,7 @@ wolker-ecommerce|107|107`;
 
 // Funnel paso 3 (Databricks): órdenes Moda, últimos 28 días (2026-10-02..2026-10-29), mismo período que la consulta
 // de Amplitude. REFRESCADO 2026-10-30. [ally|n_orders]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const T2_FUNNEL_ORDERS_RAW = `bata-ecommerce|426
 bosi-ecommerce|139
 calzatodo-ecommerce|146
@@ -5791,6 +5822,7 @@ wolker-ecommerce|98`;
 // Funnel pasos 1-2 (Amplitude, proyecto ADDI-FUNNEL 385311): UNA sola consulta de segmentación con group_by=allySlug
 // (event property), últimos 28 días (2026-10-02..2026-10-29), REFRESCADO 2026-10-30.
 // [ally|n_select_product|n_add_to_cart]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const T2_FUNNEL_AMP_RAW = `cuerosvelez-ecommerce|76259|12999
 totto-ecommerce|64565|16004
 kronotime-ecommerce|14117|2191
@@ -5824,6 +5856,7 @@ tiendasbranchos-ecommerce|7290|619`;
 // 2026-06-29 a 2026-10-26 (ultima semana parcial, solo el dia 26). Reemplaza el snapshot de barras de 28 dias por una
 // evolucion real -- a pedido de Heidy (2026-10-27, "se ve rara, mejor muestra la evolucion wow"). Celda vacia = sin dato
 // esa semana (aliado nuevo o sin ventas Moda todavia). [ally|fecha_lunes|visitas|atc|orders]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const T2_FUNNEL_WOW_RAW = `bata-ecommerce|2026-06-29|5373|508|48
 bata-ecommerce|2026-07-06|6696|671|58
 bata-ecommerce|2026-07-13|7160|694|59
@@ -6315,6 +6348,7 @@ wolker-ecommerce|2026-10-26|346|45|15`;
 // última semana en curso 2026-10-26 excluida por estar incompleta). SIN CAMBIO en el refresh 2026-10-29: la semana
 // 2026-10-26 (26-28 oct, solo 3 días) sigue incompleta por la misma regla, así que esta tabla no gana una fila nueva.
 // [ally|week_date|avg_unit_price_cop|gmv_cop|n_items]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const T2_PRICE_WEEKLY_RAW = `bata-ecommerce|2026-06-29|117699.0|6002625.0|51
 bata-ecommerce|2026-07-06|115414.0|7617305.0|66
 bata-ecommerce|2026-07-13|115572.0|7743330.0|67
@@ -6804,6 +6838,7 @@ wolker-ecommerce|2026-10-26|286625.0|4586000.0|16`;
 // consecutiva en la que queda pendiente -- ver callout de refresh arriba). Solo afecta
 // "Envío gratis elegible (catálogo) %" y "Precio catálogo" (ver Change 6 -- Disponibilidad ya usa T2_INVENTORY_RAW, que sí se refrescó).
 // [ally|week_monday|n_both_con_ambas_pistas|n_avail|n_fs_state|n_freeship|avg_catalog_price_cop]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const T2_CATALOG_LOG_WEEKLY_RAW = `cuerosvelez-ecommerce|2026-07-06|5811|4653|5982|0|297141
 cuerosvelez-ecommerce|2026-07-13|5955|4588|6095|0|295491
 cuerosvelez-ecommerce|2026-07-20|6499|4841|6636|0|275728
@@ -7258,6 +7293,7 @@ tiendasbranchos-ecommerce|2026-10-26|848|360|848|0|179392.13443396226`;
 // filtro t.l1='Moda' -- mismo scope que el resto del dashboard. cuerosvelez pasó de 45,588 a 10,784 SKUs en tabla
 // (26-oct), ahora consistente con el KPI "Disponibilidad hoy" (snapshot silver_live, 10,754 SKUs).
 // [ally|fecha_lunes|skus_en_tabla|skus_vendibles|productos_en_tabla|productos_vendibles]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const T2_INVENTORY_RAW = `bata-ecommerce|2026-06-29|1737|1235|635|339
 bata-ecommerce|2026-07-06|1907|1255|617|337
 bata-ecommerce|2026-07-13|1910|1354|505|387
@@ -8059,6 +8095,7 @@ function t2MetaIndividualCard(ally){
    Pegar el resultado en T2_LOWCONV_RAW con el mismo formato pipe-delimited que las demás tablas
    T2_* de este archivo: [ally|product_id|product_name|visitas|ordenes|unidades|cvr_pct|precio_min|max_descuento] */
 const T2_LOWCONV_MIN_VISITAS = 100;
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const T2_LOWCONV_RAW = `bata-ecommerce|3747394|Tenis Para Mujer North Star Blanco Luisa Skater Wave|607|33|34.0|5.44|101940.000000|0.4000
 bata-ecommerce|3745067|Tenis Para Hombre North Star Blanco Frodo New York|495|17|17.0|3.43|107940.000000|0.4000
 bata-ecommerce|4368123|Bota De Seguridad Para Hombre Bata Industrials Negro Huali Security Industrial|476|0|0.0|0.00|17940.000000|0.4000
@@ -8501,6 +8538,7 @@ function t2RenderLowConvTable(ally){
 // extendido hasta 2026-10-29. peopleplays-ecommerce y frutafresca-ecommerce siguen sin ningún producto vendible con
 // descuento activo (tablas vacías reales, no error, mismo caso que el refresh anterior).
 // [ally|product_id|product_name|skus_sellable|min_price_sellable_cop|max_pct_discount|gmv_cop|orders]
+// PENDIENTE DE REFRESH 2026-11-05 (conector no disponible: Databricks sin autenticar)
 const T2_DISCOUNT_RAW = `bata-ecommerce|3745067|Tenis Para Hombre North Star Blanco Frodo New York|7|107940.000000|0.4000|3921820.0|34
 bata-ecommerce|3747394|Tenis Para Mujer North Star Blanco Luisa Skater Wave|5|101940.000000|0.4000|3814255.0|36
 bata-ecommerce|3744745|Tenis Para Mujer North Star Blanco Hula Dave|6|101940.000000|0.4000|2760875.0|25
