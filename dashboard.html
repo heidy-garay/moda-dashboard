@@ -1159,9 +1159,9 @@ const DAILY = [
 ["2026-10-31",1.5149205572E8,35230.71063255814,663,656],
 ["2026-11-01",1.4798424829000002E8,34414.9414627907,686,675],
 ["2026-11-02",1.882377497E8,43776.22086046512,846,834],
-["2026-11-03",1.00847218E8,23452.841395348838,444,437],
+["2026-11-03",183041484.5,42567.78709302325,831,812],
 ["2026-11-04",1.6915805998000002E8,39339.08371627908,794,779],
-["2026-11-05",3574064.99,831.1779046511629,24,24]
+["2026-11-05",186397484.05,43348.25210465117,801,787]
 ];
 
 /* ============================================================= NUEVAS SERIES DIARIAS (Category Summary: Aliados con venta, Cancelaciones r28, GMV/Orders Marketplace total, Nuevos compradores) ============================================================= */
@@ -1172,6 +1172,7 @@ function parseDailyRaw(raw){
   }).sort((a,b)=>a[0].localeCompare(b[0]));
 }
 // [date, allies_selling] -- distinct ally_slug con venta Moda ese día.
+// REFRESCADO 2026-11-05 (anchor 2026-11-05, run automático): filas 2026-11-03 y 2026-11-05 recalculadas (11-05 era parcial; 11-03 tenía datos tardíos). Método sin cambios.
 const DAILY_ALLIES_SELLING_RAW = `2026-07-02|97
 2026-07-03|86
 2026-07-04|93
@@ -1296,10 +1297,11 @@ const DAILY_ALLIES_SELLING_RAW = `2026-07-02|97
 2026-10-31|88
 2026-11-01|89
 2026-11-02|112
-2026-11-03|93
+2026-11-03|123
 2026-11-04|116
-2026-11-05|18`;
+2026-11-05|127`;
 // [date, gmv_cop_mp, orders_mp] -- Marketplace total, sin filtro de categoría.
+// REFRESCADO 2026-11-05 (anchor 2026-11-05, run automático): filas 2026-11-03 y 2026-11-05 recalculadas (11-05 era parcial; 11-03 tenía datos tardíos). Método sin cambios.
 const DAILY_MP_RAW = `2026-07-02|1.8807179949399986E9|3699
 2026-07-03|1.657181783509999E9|3093
 2026-07-04|1.7933976868399978E9|3480
@@ -1424,10 +1426,11 @@ const DAILY_MP_RAW = `2026-07-02|1.8807179949399986E9|3699
 2026-10-31|1.5683149731100006E9|3070
 2026-11-01|1.5920704381699984E9|3170
 2026-11-02|1.977122162589997E9|4014
-2026-11-03|1.1557734696600003E9|2408
+2026-11-03|1.971127871069998E9|4198
 2026-11-04|2.1435248720400012E9|4193
-2026-11-05|6.513877734E7|167`;
+2026-11-05|2.225699039989999E9|4238`;
 // [date, suborders_cat, cancel_r28] -- ally_category IN ('Moda','Zapatos','Joyas y accesorios')
+// REFRESCADO 2026-11-05 (anchor 2026-11-05, run automático): filas 2026-11-03 y 2026-11-05 recalculadas (11-05 era parcial; 11-03 tenía datos tardíos). Método sin cambios.
 const DAILY_CANCEL_RAW = `2026-07-02|634|22
 2026-07-03|546|13
 2026-07-04|674|16
@@ -1548,13 +1551,14 @@ const DAILY_CANCEL_RAW = `2026-07-02|634|22
 2026-10-27|790|6
 2026-10-28|932|2
 2026-10-29|850|2
-2026-10-30|710|2
-2026-10-31|700|6
-2026-11-01|730|2
-2026-11-02|909|4
-2026-11-03|470|4
-2026-11-04|848|4
-2026-11-05|26|0`;
+2026-10-30|710|3
+2026-10-31|700|8
+2026-11-01|730|7
+2026-11-02|909|5
+2026-11-03|879|12
+2026-11-04|848|6
+2026-11-05|857|5`;
+// REFRESCADO 2026-11-05 (anchor 2026-11-05, run automático): filas 2026-11-03 y 2026-11-05 recalculadas (11-05 era parcial; 11-03 tenía datos tardíos). Método sin cambios.
 const DAILY_NEWBUYERS_RAW = `2026-07-02|463|295
 2026-07-03|375|231
 2026-07-04|471|282
@@ -1679,10 +1683,11 @@ const DAILY_NEWBUYERS_RAW = `2026-07-02|463|295
 2026-10-31|452|267
 2026-11-01|455|277
 2026-11-02|541|301
-2026-11-03|291|157
+2026-11-03|555|308
 2026-11-04|531|325
-2026-11-05|20|10`;
+2026-11-05|533|333`;
 // [date, skus_con_venta]
+// REFRESCADO 2026-11-05 (anchor 2026-11-05, run automático): filas 2026-11-03 y 2026-11-05 recalculadas (11-05 era parcial; 11-03 tenía datos tardíos). Método sin cambios.
 const DAILY_LISTINGS_SOLD_RAW = `2026-07-02|440
 2026-07-03|405
 2026-07-04|468
@@ -1807,9 +1812,9 @@ const DAILY_LISTINGS_SOLD_RAW = `2026-07-02|440
 2026-10-31|614
 2026-11-01|629
 2026-11-02|768
-2026-11-03|429
+2026-11-03|805
 2026-11-04|692
-2026-11-05|21`;
+2026-11-05|727`;
 const DAILY_ALLIES_SELLING = parseDailyRaw(DAILY_ALLIES_SELLING_RAW);
 const DAILY_MP = parseDailyRaw(DAILY_MP_RAW);
 const DAILY_CANCEL = parseDailyRaw(DAILY_CANCEL_RAW);
@@ -1914,6 +1919,7 @@ const L2L3_SALES = [
 // Solo incluye aliados que matchean un bucket (nuevo <=30d primera venta, O última venta >=28d atrás).
 // Pipe-CSV: ally|cluster|first_sale|last_sale|gmv_cop|orders|distinct_skus|days_since_last|days_since_first
 // cluster puede venir vacío (sin match en ally_cluster para ese ally_slug en el scope Moda).
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const ALLY_LIFECYCLE_CSV = `joyeriabreslestor-ecommerce|SMB|2024-11-29|2026-07-03|1.8810865435000002E8|74|13|118|699
 alpakashop-ecommerce|SMB|2025-09-10|2026-07-22|7.794317647E7|474|172|99|414
 carlosmarinjoyeria-ecommerce|SMB|2025-06-03|2026-01-27|5.86147E7|143|86|275|513
@@ -2254,6 +2260,7 @@ function parseWeeklyRaw(raw, nFields){
   }).sort((a,b)=>a[0].localeCompare(b[0]));
 }
 // [wk, gmv_cop, gmv_cop_dup(sin uso), orders, buyers, allies_selling, 0(sin uso)]
+// REFRESCADO 2026-11-05 (anchor 2026-11-05, run automático): filas 2026-11-03 y 2026-11-05 recalculadas (11-05 era parcial; 11-03 tenía datos tardíos). Método sin cambios.
 const WEEKLY_BEAUTY_1Y_RAW = `2025-09-01|6.1922491321E8|6.1922491321E8|2373|2319|160|0
 2025-09-08|5.482454179100001E8|5.482454179100001E8|2115|2069|152|0
 2025-09-15|6.3693154964E8|6.3693154964E8|2430|2350|167|0
@@ -2315,7 +2322,8 @@ const WEEKLY_BEAUTY_1Y_RAW = `2025-09-01|6.1922491321E8|6.1922491321E8|2373|2319
 2026-10-12|1.17987798694E9|1.17987798694E9|5338|5140|233|0
 2026-10-19|1.18108920581E9|1.18108920581E9|5161|4993|214|0
 2026-10-26|1.17832812701E9|1.17832812701E9|5231|5037|223|0
-2026-11-02|2.890849677E8|2.890849677E8|1290|1264|134|0`;
+2026-11-02|7.2683477823E8|7.2683477823E8|3272|3181|204|0`;
+// REFRESCADO 2026-11-05 (anchor 2026-11-05, run automático): filas 2026-11-03 y 2026-11-05 recalculadas (11-05 era parcial; 11-03 tenía datos tardíos). Método sin cambios.
 const WEEKLY_MP_1Y_RAW = `2025-09-01|7.9869790381E9|16291|0
 2025-09-08|7.222101819880001E9|14834|0
 2025-09-15|9.226646311310001E9|16825|0
@@ -2377,7 +2385,8 @@ const WEEKLY_MP_1Y_RAW = `2025-09-01|7.9869790381E9|16291|0
 2026-10-12|1.5281807179209995E10|28101|0
 2026-10-19|1.4322888841719994E10|26992|0
 2026-10-26|1.2448433663959997E10|24811|0
-2026-11-02|3.1328956322500005E9|6422|0`;
+2026-11-02|8.317473945689983E9|16643|0`;
+// REFRESCADO 2026-11-05 (anchor 2026-11-05, run automático): filas 2026-11-03 y 2026-11-05 recalculadas (11-05 era parcial; 11-03 tenía datos tardíos). Método sin cambios.
 const WEEKLY_NEWBUYERS_1Y_RAW = `2025-09-01|1801|1130
 2025-09-08|1622|1047
 2025-09-15|1857|1138
@@ -2439,10 +2448,11 @@ const WEEKLY_NEWBUYERS_1Y_RAW = `2025-09-01|1801|1130
 2026-10-12|3646|2315
 2026-10-19|3583|2189
 2026-10-26|3524|2139
-2026-11-02|832|458`;
+2026-11-02|2160|1267`;
 // [wk, suborders_cat, cancel_r28] -- TRIMMED a semanas maduras (>=28 días antes de 2026-10-26): último valor 2026-09-21.
 // SIN CAMBIO en el refresh 2026-10-29: con anchor 2026-10-28 la regla de madurez (wk+6+28<=anchor) sigue sin madurar
 // la semana 2026-09-28 (necesita anchor>=2026-11-01), así que el último valor maduro sigue siendo 2026-09-21.
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const WEEKLY_CANCEL_1Y_RAW = `2025-09-01|2519|60
 2025-09-08|2255|54
 2025-09-15|2579|83
@@ -2507,6 +2517,7 @@ const WEEKLY_CANCEL_1Y = parseWeeklyRaw(WEEKLY_CANCEL_1Y_RAW);
 // wk|intro_cop|cupo_cop|grande_cop|otro_cop (crudo, SIN reescalar -- se reescala en runtime al GMV real de WEEKLY_BEAUTY_1Y).
 // Fuente: addi_prod.gold.dm_originations_marketplace_suborders_co, application_synthetic_product_category,
 // scope suborder_ally_category IN ('Moda','Zapatos','Joyas y accesorios'), excluye MISSING_LOAN_PROPOSAL_PRODUCTV2.
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const WEEKLY_CREDIT_TYPE_RAW = `2025-09-01|2.1570052845E8|1.9901761368E8|1.9923754733E8|3290344.0
 2025-09-08|2.06392795451E8|1.7792680682E8|1.5809500229E8|2204989.8
 2025-09-15|2.4795899797E8|2.7175740553E8|1.0984715599E8|3829739.25
@@ -2569,6 +2580,7 @@ const WEEKLY_CREDIT_TYPE_RAW = `2025-09-01|2.1570052845E8|1.9901761368E8|1.99237
 2026-10-19|5.992909398699999E8|4.0548422563E8|1.1953742800000001E8|1.0169206E7
 2026-10-26|3.9061322442E8|2.2097342225000003E8|7.425752544E7|1.064989E7`;
 // [d, intro_cop, cupo_cop, grande_cop, otro_cop] -- diario (igual scope que arriba)
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const DAILY_CREDIT_TYPE_RAW = `2026-07-02|7.83578216E7|4.1155143E7|1.70956088E7|1961219.0
 2026-07-03|6.564001638E7|4.144758124E7|1.34859818E7|1612732.0
 2026-07-04|8.001161116E7|4.925539299E7|1.094567201E7|815628.0
@@ -2693,6 +2705,7 @@ const WEEKLY_CREDIT_TYPE = parseWeeklyRaw(WEEKLY_CREDIT_TYPE_RAW);
 const DAILY_CREDIT_TYPE = parseDailyRaw(DAILY_CREDIT_TYPE_RAW);
 
 // [wk, gmv_usd, mdf_usd, lead_gen_usd, mpf_usd, contribution_income_usd] -- aplicaciones Moda (ally_category)
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const WEEKLY_TAKERATE_RAW = `2025-09-01|209272.77777857144|9108.581228869043|0.0|22188.94104490475|23037.77835536967
 2025-09-08|178999.21330000006|7937.403314047619|0.0|18855.17303978569|19747.692177880712
 2025-09-15|217666.1548380953|9732.40283222619|0.0|22927.33224392857|29739.83209632925
@@ -2755,6 +2768,7 @@ const WEEKLY_TAKERATE_RAW = `2025-09-01|209272.77777857144|9108.581228869043|0.0
 2026-10-19|344410.0386571428|11543.615177550002|0.0|38053.55712854999|30061.162841039277
 2026-10-26|211054.4381142857|7137.365351278573|0.0|23324.436548045225|21012.027203486672`;
 // [d, gmv_usd, mdf_usd, lead_gen_usd, mpf_usd, contribution_income_usd] -- diario (mismo scope, con contribution income)
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const DAILY_TAKERATE2_RAW = `2026-07-02|41616.52506666666|1481.9911321952388|0.0|4508.859325190476|3379.6737261911926
 2026-07-03|34181.44726428571|1064.6294065761895|0.0|3899.2595158690474|2421.362428487588
 2026-07-04|41302.50523333332|1218.2839596000008|0.0|4654.949385357145|3268.104954326888
@@ -2880,6 +2894,7 @@ const DAILY_TAKERATE2 = parseDailyRaw(DAILY_TAKERATE2_RAW);
 
 // [wk, visitas(SELECT_PRODUCT usuarios únicos), atc(SELECT_ADD_TO_CART usuarios únicos)] -- Amplitude, proyecto
 // ADDI-FUNNEL (385311), departmentName IN ('Moda mujer','Moda hombre'). 83 semanas reales desde 2025-03-24.
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const WEEKLY_TRAFFIC_AMP_RAW = `2025-03-24|15962|6457
 2025-03-31|34058|6978
 2025-04-07|34516|6629
@@ -2964,6 +2979,7 @@ const WEEKLY_TRAFFIC_AMP_RAW = `2025-03-24|15962|6457
 2026-10-12|66354|13974
 2026-10-19|68704|13977
 2026-10-26|38509|8477`;
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const DAILY_TRAFFIC_AMP_RAW = `2026-07-02|10043|1796
 2026-07-03|8376|1562
 2026-07-04|9320|1738
@@ -3088,6 +3104,7 @@ const WEEKLY_TRAFFIC_AMP = parseWeeklyRaw(WEEKLY_TRAFFIC_AMP_RAW);
 const DAILY_TRAFFIC_AMP = parseDailyRaw(DAILY_TRAFFIC_AMP_RAW);
 
 // [wk, otro, falta_stock, retracto, otros_menores] -- razones de cancelación r28, scope Moda (ally_category)
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const WEEKLY_CANCEL_REASONS_RAW = `2025-09-01|36|9|10|5
 2025-09-08|31|1|17|5
 2025-09-15|62|9|6|6
@@ -3152,6 +3169,7 @@ const WEEKLY_CANCEL_REASONS_RAW = `2025-09-01|36|9|10|5
 const WEEKLY_CANCEL_REASONS = parseWeeklyRaw(WEEKLY_CANCEL_REASONS_RAW);
 
 // [wk, total, free_shipping_n, lba_n, free_and_lba_n] -- subórdenes Moda (bridge via suborder_vtex_external_id_array[0])
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const WEEKLY_FREE_SHIPPING_RAW = `2025-09-01|2519|202|0|0
 2025-09-08|2255|300|0|0
 2025-09-15|2579|392|0|0
@@ -3213,6 +3231,7 @@ const WEEKLY_FREE_SHIPPING_RAW = `2025-09-01|2519|202|0|0
 2026-10-12|5497|759|0|0
 2026-10-19|5269|886|0|0
 2026-10-26|3329|378|0|0`;
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const DAILY_FREE_SHIPPING_RAW = `2026-07-02|603|51|0|0
 2026-07-03|480|29|0|0
 2026-07-04|562|43|0|0
@@ -5101,6 +5120,7 @@ wolker-ecommerce|576`;
 // Tiering por GMV histórico (180 días, marketplace_products_pa, l1='Moda'): tier 1 = SKUs que acumulan el primer 50% del GMV del
 // aliado (ordenados desc), tier 2 = tramo 50-80%, tier 3 = tramo 80-100%. n_available = disponibles HOY dentro del tier.
 // [ally|tier|n_skus|tier_gmv_cop|n_available]
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const T2_TIER_RAW = `bata-ecommerce|1|156|1.2754949205E8|126
 bata-ecommerce|2|332|7.711165E7|247
 bata-ecommerce|3|498|5.1201115E7|392
@@ -5189,6 +5209,7 @@ wolker-ecommerce|3|132|4.11486E7|126`;
 // desc -- ampliado 2026-10-19 a pedido de Heidy (antes limitaba a 5). pct = GMV del SKU / GMV TOTAL del aliado
 // (los 3 tiers juntos, 180d), no solo del tier 1. Delimitador "~" porque el nombre de producto puede traer comas.
 // [ally~sku_id~product_name~gmv_cop_180d~pct_of_ally_total_gmv]
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const T2_TIER1_DOWN_RAW = `bata-ecommerce~3969523~Tenis Para Mujer North Star Blanco Luisa Skater Wave~2370105.0~0.00926320680246653
 bata-ecommerce~5097665~Tenis Para Mujer North Star Beige Máximo Midas Casual~1484010.0~0.005800034819946101
 bata-ecommerce~5097671~Tenis Para Mujer North Star Beige Máximo Midas Casual~1289140.0~0.005038414086013785
@@ -6072,6 +6093,7 @@ tiendasbranchos-ecommerce|7290|619`;
 // 2026-06-29 a 2026-10-26 (ultima semana parcial, solo el dia 26). Reemplaza el snapshot de barras de 28 dias por una
 // evolucion real -- a pedido de Heidy (2026-10-27, "se ve rara, mejor muestra la evolucion wow"). Celda vacia = sin dato
 // esa semana (aliado nuevo o sin ventas Moda todavia). [ally|fecha_lunes|visitas|atc|orders]
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const T2_FUNNEL_WOW_RAW = `bata-ecommerce|2026-06-29|5373|508|48
 bata-ecommerce|2026-07-06|6696|671|58
 bata-ecommerce|2026-07-13|7160|694|59
@@ -6563,6 +6585,7 @@ wolker-ecommerce|2026-10-26|346|45|15`;
 // última semana en curso 2026-10-26 excluida por estar incompleta). SIN CAMBIO en el refresh 2026-10-29: la semana
 // 2026-10-26 (26-28 oct, solo 3 días) sigue incompleta por la misma regla, así que esta tabla no gana una fila nueva.
 // [ally|week_date|avg_unit_price_cop|gmv_cop|n_items]
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const T2_PRICE_WEEKLY_RAW = `bata-ecommerce|2026-06-29|117699.0|6002625.0|51
 bata-ecommerce|2026-07-06|115414.0|7617305.0|66
 bata-ecommerce|2026-07-13|115572.0|7743330.0|67
@@ -7052,6 +7075,7 @@ wolker-ecommerce|2026-10-26|286625.0|4586000.0|16`;
 // consecutiva en la que queda pendiente -- ver callout de refresh arriba). Solo afecta
 // "Envío gratis elegible (catálogo) %" y "Precio catálogo" (ver Change 6 -- Disponibilidad ya usa T2_INVENTORY_RAW, que sí se refrescó).
 // [ally|week_monday|n_both_con_ambas_pistas|n_avail|n_fs_state|n_freeship|avg_catalog_price_cop]
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const T2_CATALOG_LOG_WEEKLY_RAW = `cuerosvelez-ecommerce|2026-07-06|5811|4653|5982|0|297141
 cuerosvelez-ecommerce|2026-07-13|5955|4588|6095|0|295491
 cuerosvelez-ecommerce|2026-07-20|6499|4841|6636|0|275728
@@ -7506,6 +7530,7 @@ tiendasbranchos-ecommerce|2026-10-26|848|360|848|0|179392.13443396226`;
 // filtro t.l1='Moda' -- mismo scope que el resto del dashboard. cuerosvelez pasó de 45,588 a 10,784 SKUs en tabla
 // (26-oct), ahora consistente con el KPI "Disponibilidad hoy" (snapshot silver_live, 10,754 SKUs).
 // [ally|fecha_lunes|skus_en_tabla|skus_vendibles|productos_en_tabla|productos_vendibles]
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const T2_INVENTORY_RAW = `bata-ecommerce|2026-06-29|1737|1235|635|339
 bata-ecommerce|2026-07-06|1907|1255|617|337
 bata-ecommerce|2026-07-13|1910|1354|505|387
@@ -8312,6 +8337,7 @@ function t2MetaIndividualCard(ally){
    Pegar el resultado en T2_LOWCONV_RAW con el mismo formato pipe-delimited que las demás tablas
    T2_* de este archivo: [ally|product_id|product_name|visitas|ordenes|unidades|cvr_pct|precio_min|max_descuento] */
 const T2_LOWCONV_MIN_VISITAS = 100;
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const T2_LOWCONV_RAW = `bata-ecommerce|3747394|Tenis Para Mujer North Star Blanco Luisa Skater Wave|607|33|34.0|5.44|101940.000000|0.4000
 bata-ecommerce|3745067|Tenis Para Hombre North Star Blanco Frodo New York|495|17|17.0|3.43|107940.000000|0.4000
 bata-ecommerce|4368123|Bota De Seguridad Para Hombre Bata Industrials Negro Huali Security Industrial|476|0|0.0|0.00|17940.000000|0.4000
@@ -8754,6 +8780,7 @@ function t2RenderLowConvTable(ally){
 // extendido hasta 2026-10-29. peopleplays-ecommerce y frutafresca-ecommerce siguen sin ningún producto vendible con
 // descuento activo (tablas vacías reales, no error, mismo caso que el refresh anterior).
 // [ally|product_id|product_name|skus_sellable|min_price_sellable_cop|max_pct_discount|gmv_cop|orders]
+// PENDIENTE DE REFRESH 2026-11-05: no se refrescó en este run (query compleja / tiempo); sigue con datos hasta su último bucket previo.
 const T2_DISCOUNT_RAW = `bata-ecommerce|3745067|Tenis Para Hombre North Star Blanco Frodo New York|7|107940.000000|0.4000|3921820.0|34
 bata-ecommerce|3747394|Tenis Para Mujer North Star Blanco Luisa Skater Wave|5|101940.000000|0.4000|3814255.0|36
 bata-ecommerce|3744745|Tenis Para Mujer North Star Blanco Hula Dave|6|101940.000000|0.4000|2760875.0|25
