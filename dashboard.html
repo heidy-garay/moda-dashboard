@@ -3894,6 +3894,10 @@ function allyGmvTargetSum(monthlyTargetCop, fromStr, toStr){
 const monthlyTargetUsd = TARGETS.belleza.monthly[GMV_TARGET_MONTH_KEYS[CURRENT_YM]];
 const weeklyTargetUsd = gmvTargetSum(last7[0].date, last7[last7.length-1].date);
 const expectedToDateUsd = gmvTargetSum(CURRENT_YM+'-01', D[idxYesterday].date);
+// AGREGADO (pedido Heidy): mismo prorrateo que expectedToDateUsd (meta), pero aplicado al Forecast mensual fijo
+// (FORECAST_MONTHLY_USD) -- reutiliza allyGmvTargetFor/Sum (Change 2) porque esa función ya prorratea un monto
+// mensual ARBITRARIO con la misma curva de pesos, sin importar que el nombre diga "ally" (es unit-agnostic).
+const expectedForecastToDateUsd = allyGmvTargetSum(FORECAST_MONTHLY_USD[GMV_TARGET_MONTH_KEYS[CURRENT_YM]], CURRENT_YM+'-01', D[idxYesterday].date);
 const mtdAttainmentVsProrated = AMTD.gmvUsd/expectedToDateUsd;
 const weekAttainment = A7.gmvUsd/weeklyTargetUsd;
 
@@ -3997,8 +4001,14 @@ function metaBarHtml(tag, value, target){
   return `<div class="foot" style="margin-top:4px;">${tag} <b>${usd(target)}</b> <b style="color:${color}">${(att*100).toFixed(1)}%</b></div>
     <div class="progress" style="height:4px; margin:3px 0 1px;"><i style="width:${Math.min(100,att*100).toFixed(1)}%; background:${color};"></i></div>`;
 }
-function gmvMetaExtra(periodTag, periodValue, periodTarget, mtdTag){
-  return metaBarHtml(periodTag, periodValue, periodTarget) + metaBarHtml(mtdTag, AMTD.gmvUsd, expectedToDateUsd);
+function gmvMetaExtra(periodTag, periodValue, periodTarget, mtdTag, showForecastMtd){
+  let html = metaBarHtml(periodTag, periodValue, periodTarget) + metaBarHtml(mtdTag, AMTD.gmvUsd, expectedToDateUsd);
+  // AGREGADO (pedido Heidy, solo tarjeta Weekly): cómo vamos MTD vs el Forecast fijo -- mismo prorrateo que la
+  // barra de Meta MTD de arriba (expectedForecastToDateUsd), pero contra FORECAST_MONTHLY_USD en vez de la meta.
+  if(showForecastMtd){
+    html += metaBarHtml(`Forecast MTD (${mtdDaysElapsed}d)`, AMTD.gmvUsd, expectedForecastToDateUsd);
+  }
+  return html;
 }
 function gmvRepartoMethodLabel(ym){ return ym==='2026-10' ? 'reparto oficial día-de-mes de octubre' : `reparto día-de-semana + ventana de campaña de ${monthEsLabel(ym)}`; }
 // AGREGADO (pedido Heidy): selector de mes para la tarjeta GMV de la vista Monthly -- antes solo se podía ver el
@@ -4014,10 +4024,22 @@ function monthPillsHtml(selYm){
 }
 // AJUSTADO 2026-11-05 a pedido de Heidy: ya NO se calcula una proyección por run-rate -- Meta y Forecast son
 // ahora dos cifras oficiales fijas que Heidy comparte mes a mes (FORECAST_MONTHLY_USD), no algo que el dashboard
-// derive. La tarjeta se simplifica a dos barras: real vs Meta del mes, real vs Forecast del mes.
+// derive. La tarjeta muestra real vs Meta del mes, real vs Forecast del mes.
+// AGREGADO 2026-11-09 a pedido de Heidy: + 2 barras "cómo vamos MTD" (pacing) -- el real a la fecha (actualToDate)
+// contra la porción de Meta/Forecast que ya debería haberse cumplido a esta altura del mes (mismo prorrateo por
+// peso día-de-mes que usa expectedToDateUsd/expectedForecastToDateUsd, vía allyGmvTargetSum). A diferencia de las
+// barras "Meta mes"/"Forecast mes" (real vs el TOTAL del mes, siempre bajo mientras el mes no cierre), estas dos
+// nuevas muestran si vamos en línea con el ritmo esperado a esta altura del mes -- para un mes YA CERRADO
+// (isComplete) el prorrateo a la fecha = el total del mes, así que coinciden con las barras de arriba (esperado).
 function gmvMonthlyMetaExtra(ym, cutoff, actualToDate, target){
   const forecast = FORECAST_MONTHLY_USD[GMV_TARGET_MONTH_KEYS[ym]] ?? null;
-  return metaBarHtml('Meta mes', actualToDate, target) + metaBarHtml('Forecast mes', actualToDate, forecast);
+  const {start} = monthBounds(ym);
+  const planToDateMeta = gmvTargetSum(start, cutoff);
+  const planToDateForecast = forecast!=null ? allyGmvTargetSum(forecast, start, cutoff) : null;
+  return metaBarHtml('Meta mes', actualToDate, target)
+    + metaBarHtml('Forecast mes', actualToDate, forecast)
+    + metaBarHtml('MTD vs Meta (pacing)', actualToDate, planToDateMeta)
+    + metaBarHtml('MTD vs Forecast (pacing)', actualToDate, planToDateForecast);
 }
 function weeklyDeltaStats(arr, idx, valueFn){
   if(idx==null || idx<0 || !arr[idx]) return {value:null, wow:null, vsL4W:null};
@@ -4049,7 +4071,7 @@ function renderKpiRow(freq){
     periodLabel = `Semana completa más reciente: ${wkDate} (lun-dom)`;
     cards = [
       kpiCardDeltas('GMV semana (USD)', usd(wGmv.value), chipsFor(wGmv,YOY_GMV), `Semana del ${wkDate}`,
-        gmvMetaExtra('Meta semana', wGmv.value, gmvTargetSum(wkDate, addDaysStr(wkDate,6)), `Meta MTD (${mtdDaysElapsed}d)`)),
+        gmvMetaExtra('Meta semana', wGmv.value, gmvTargetSum(wkDate, addDaysStr(wkDate,6)), `Meta MTD (${mtdDaysElapsed}d)`, true)),
       kpiCardDeltas('Órdenes', int(wOrders.value), chipsFor(wOrders,YOY_ORDERS), `Semana del ${wkDate}`),
       kpiCardDeltas('AOV (USD)', usd(wAov.value,1), chipsFor(wAov,YOY_AOV), `Semana del ${wkDate}`),
       kpiCardDeltas('Compradores', int(wBuyers.value), chipsFor(wBuyers,YOY_BUYERS), `Semana del ${wkDate}`),
