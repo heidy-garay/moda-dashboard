@@ -1,12 +1,17 @@
 # Moda Dashboard — Refresh Repo
 
-Este repo guarda `dashboard.html`, el dashboard de categoría Moda (marketplace Addi) construido como un Artifact de Claude autocontenido (HTML + JS embebido, sin dependencias externas).
+Este repo guarda `dashboard.html`, el dashboard de categoría Moda (marketplace Addi) construido como una página HTML autocontenida (HTML + JS embebido, sin dependencias externas).
 
-Una rutina programada (Claude Code en la nube, de lunes a viernes) actualiza `dashboard.html` cada mañana con datos al día hábil anterior, y hace commit + push de los cambios a este repo.
+## Cómo verlo
 
-**Importante: la rutina NO publica el Artifact en vivo.** Solo deja el HTML actualizado commiteado aquí. Publicar la nueva versión en `https://claude.ai/artifact/UZZ7gpLjezLtHSn1g18zgE` es un paso manual: alguien (Heidy, o una sesión local de Claude Code) debe tomar `dashboard.html` de este repo y republicarlo con la herramienta Artifact.
+**Dashboard en vivo (GitHub Pages, se actualiza solo):**
+https://heidy-garay.github.io/moda-dashboard/dashboard.html
 
-## Flujo manual de publicación
+Una rutina programada (Claude Code en la nube, de lunes a viernes 8am hora Bogotá) actualiza `dashboard.html`
+con datos al día hábil anterior y hace commit + push a `main`. GitHub Pages sirve directo desde `main`, así
+que el link de arriba refleja el último push automáticamente — **no hace falta ningún paso manual**.
 
-1. Clonar o hacer pull de este repo.
-2. Pedirle a Claude Code (sesión local, con acceso a la herramienta Artifact) que lea `dashboard.html` y lo publique a la URL del Artifact existente.
+## Historial
+
+También existe un Artifact de Claude con una versión anterior (congelada, ya no se actualiza):
+https://claude.ai/artifact/UZZ7gpLjezLtHSn1g18zgE — se deja solo como referencia histórica.
