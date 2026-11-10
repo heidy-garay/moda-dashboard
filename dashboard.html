@@ -390,7 +390,11 @@
       <div class="section-title" style="margin-top:26px;">
         <span class="eyebrow">Oferta</span>
         <h2>Apertura por L2 / L3</h2>
-        <p>Categoría completa · últimos 30 días · ordenado por GMV</p>
+        <p>Categoría completa · semana cerrada lun-dom o MTD (toggle) · Share GMV recalculado contra el total de la categoría en ese mismo período</p>
+      </div>
+      <div class="table-tools">
+        <div class="metric-toggle" id="l2l3LevelToggle"><button data-lvl="L2" class="on">L2</button><button data-lvl="L3">L3</button></div>
+        <div class="metric-toggle" id="l2l3FreqToggle"><button data-f="weekly" class="on">Weekly</button><button data-f="monthly">Monthly</button></div>
       </div>
       <div class="table-scroll">
         <table id="l2l3Table"></table>
@@ -398,12 +402,13 @@
 
       <div class="section-title" style="margin-top:26px;">
         <span class="eyebrow">Aliados</span>
-        <h2>Aliados — Top 25 por GMV</h2>
-        <p>Últimos 7 días vs 7 días previos · MTD vs mismo tramo del mes anterior</p>
+        <h2>Aliados — Top por GMV</h2>
+        <p>Los 27 aliados de Ally Deep-Dive · semana cerrada lun-dom o MTD (toggle) vs período comparable anterior</p>
       </div>
       <div class="table-tools">
+        <div class="metric-toggle" id="allyFreqToggle"><button data-f="weekly" class="on">Weekly</button><button data-f="monthly">Monthly</button></div>
         <div class="search">🔎 <input id="allySearch" placeholder="Buscar aliado…"></div>
-        <span class="foot-note">Click en encabezado no disponible aún — orden fijo por GMV MTD</span>
+        <span class="foot-note">Click en encabezado no disponible aún — orden por GMV del período activo</span>
       </div>
       <div class="table-scroll scroll-y">
         <table id="allyTable"></table>
@@ -1843,92 +1848,197 @@ const DAILY_LISTINGS_SOLD = parseDailyRaw(DAILY_LISTINGS_SOLD_RAW);
 // cálculo que las consumía en el dashboard de Beauty (gSelectedUsers/gAtcRate/gTakeRate) nunca se
 // mostraba en ninguna tarjeta -- era código muerto. Se omite aquí en vez de copiarlo sin uso.
 
-// [ally_slug, cluster, gmv7, gmvPrior7, gmvMtd, gmvLastMonthToDate, orders7, ordersPrior7]
-// AJUSTADO 2026-11-03 (misma extensión del cambio de GMV pedido por Heidy): sale de
-// dm_originations_marketplace_master_table_by_suborder, bruto, /4300. REFRESCADO 2026-11-05 (anchor 2026-11-04):
-// gmv7 = 2026-10-29..11-04, gmvPrior7 = 2026-10-22..10-28, gmvMtd = 2026-11-01..11-04 (mes en curso),
-// gmvLastMonthToDate = 2026-10-01..10-04
-// (MISMO tramo de 2 días en octubre, para que "Δ vs mismo tramo mes ant." siga comparando manzanas con manzanas).
-// CAMBIO DE CRITERIO DE ORDEN (solo para elegir/ordenar el Top 25, no es un campo del array): con el mes recién
-// empezado, GMV MTD (2 días) es demasiado ruidoso para rankear -- se usó el GMV de OCTUBRE COMPLETO (no el tramo
-// de arriba) para decidir qué 25 aliados entran y en qué orden, por ser el período completo más reciente y
-// comparable entre todos. Una vez elegidos, cada fila guarda su propio gmvLastMonthToDate en el tramo de 2 días
-// (consistente con el resto del array), no el mes completo que se usó solo para el ranking.
-// MISMA corrección de ally_category que T2_GMV_RAW (ver su comentario arriba): el universo candidato salió primero
-// de ally_category IN ('Moda','Zapatos','Joyas y accesorios'), pero 6 de los 27 aliados de T2_ALLIES que SÍ
-// entraron a este nuevo Top 25 (peopleplays/ventasenlineacorpsas/prochampions/pacificsportcolombia/sportzone/
-// maeskoshop) están clasificados bajo otro ally_category en esta tabla -- se tomaron sus valores reales por
-// ally_slug (mismos que T2_GMV) en vez de dejarlos en $0 o fuera del ranking por el filtro de categoría.
-const ALLIES = [
-["cuerosvelez-ecommerce","KA",3.1256765897E8,3.17719196E8,1.9089870998000002E8,1.12825316E8,1246,1146],
-["totto-ecommerce","KA",2.32674541E8,2.4777065E8,1.22599791E8,7.7014E7,1428,1440],
-["peopleplays-ecommerce",null,5.8158251E7,5.0152884E7,3.1683458E7,3.7672104E7,204,168],
-["kronotime-ecommerce","KA",5.77446E7,5.27329E7,3.34572E7,2.09832E7,180,174],
-["ventasenlineacorpsas-ecommerce",null,3.643239E7,4.410729E7,2.238769E7,8569490.0,54,68],
-["grupomerpes-social","MB",2.66087E7,1.74754E7,1.22884E7,1.79687E7,72,63],
-["prochampions-ecommerce",null,2.7599855E7,3.5397013E7,1.7892315E7,1.716359E7,93,114],
-["bata-ecommerce","KA",3.5199045E7,2.9750965E7,2.2462915E7,1.5195217E7,247,201],
-["mariohdz-ecommerce","KA",3.4201833E7,2.7179072E7,1.629839E7,9829615.0,92,73],
-["dayoshop-ecommerce","MB",2.25956E7,2.35282E7,1.43641E7,1.27106E7,187,196],
-["labarcashop-ecommerce","MB",2.14915E7,2.580825E7,1.19948E7,9292300.0,57,73],
-["pacificsportcolombia-ecommerce",null,2.332815E7,2.270113E7,1.380551E7,9353680.0,80,78],
-["sportzone-ecommerce",null,1.35761E7,1.7140585E7,7828500.0,1.10518E7,56,67],
-["casashock-ecommerce","SMB",2.3141746889999997E7,1.6201004629999999E7,1.370895026E7,9327517.629999999,199,148],
-["bosi-ecommerce","KA",2.054996E7,1.210999E7,1.1634735E7,4994320.0,82,50],
-["kuwala-ecommerce","SMB",1.503878E7,1.30577E7,1.0146305E7,9324900.0,144,130],
-["maeskoshop-ecommerce",null,1.03849E7,1.57224E7,5808600.0,9436000.0,40,37],
-["byserenastore-ecommerce","SMB",1.3096E7,1.6024E7,7990000.0,1.01449E7,41,43],
-["cassio2-ecommerce","SMB",1.277455E7,1.083815E7,5997750.0,5381800.0,9,12],
-["frutafresca-ecommerce","MB",6180600.0,1.644266E7,4207900.0,6497500.0,15,38],
-["levis-ecommerce","KA",1.354859E7,1.334308E7,7889420.0,2019510.0,48,54],
-["tennis-ecommerce","KA",1.0047022E7,1.0784197E7,6725662.0,3842976.0,64,65],
-["andikstore-ecommerce","SMB",8698200.0,7774000.0,3435300.0,3497300.0,36,49],
-["hangar-ecommerce","SMB",1.9042565E7,8911550.0,1.0712565E7,2819700.0,19,17],
-["lecoqsportif-ecommerce","KA",5983500.0,7495500.0,3360000.0,1226000.0,18,28]
-];
-// GMV Moda últimos 30 días (2026-09-29 a 2026-10-28), suma de marketplace_products_pa join taxonomía (l1='Moda').
-// Refrescado 2026-10-29 (último día maduro 2026-10-28, ventana movida +2 días vs. el snapshot anterior del 2026-10-26).
-const CATEGORY_GMV_30D_COP = 3674923994.96;
+// AGREGADO 2026-11-09 a pedido de Heidy: tabla "Aliados -- Top por GMV" reconstruida con semana cerrada
+// lun-dom + MTD (actual y período comparable anterior), y Listings con venta / Listings activos. Fuente:
+// addi_prod.sandbox.marketplace_products_pa JOIN f_catalog_taxonomy_current_co (t.is_active=true, l1='Moda') --
+// NO ally_category/master_table_by_suborder: esa tabla es a nivel ALIADO (sin sku_id), imposible de agrupar por
+// L2/L3, y su clasificación por aliado a veces no coincide con qué vende el aliado (ver nota en T2_GMV_RAW: 6 de
+// estos 27 aliados quedaban en $0 ahí). gmvusd = SUM(gmv_usd) real de la tabla (no una conversión manual COP→USD).
+// Semana cerrada lun-dom: actual 2026-11-02..11-08, anterior 2026-10-26..11-01. MTD: actual 2026-11-01..11-08,
+// anterior MISMO tramo (8 días) 2026-10-01..10-08. Lista = los 27 aliados de T2_ALLIES (Moda no tiene un
+// "piloto" propio distinto, se reutiliza el mismo universo prioritario que Ally Deep-Dive).
+// [ally|gmv_w|gmv_wprev|gmv_mtd|gmv_mtdprev|gmvusd_w|gmvusd_mtd|orders_w|orders_wprev|orders_mtd|orders_mtdprev|lv_w|lv_wprev|lv_mtd|lv_mtdprev]
+const ALLY_PERIOD_RAW = `mariohdz-ecommerce|3.24898E7|3.26769E7|3.59778E7|1.84118E7|7735.666666666668|8566.142857142859|97|91|107|63|109|92|119|40
+totto-ecommerce|9.8916242E7|1.4213225E8|1.16531242E8|1.017253E8|23551.48619047619|27745.533809523808|651|919|777|678|315|453|366|298
+cuerosvelez-ecommerce|2.9305051996000004E8|2.8677884998E8|3.3772264995E8|2.500145E8|69773.93332380951|80410.15474999999|1221|1216|1392|1017|778|657|848|553
+bata-ecommerce|2.073404E7|1.553915E7|2.275492E7|1.7434095E7|4936.67619047619|5417.838095238095|154|111|169|136|160|128|171|154
+bosi-ecommerce|1.4102405E7|1.191525E7|1.646343E7|9054710.0|3357.715476190476|3919.864285714285|52|53|65|26|49|56|61|27
+tennis-ecommerce|1.0376205E7|6867765.0|1.0944685E7|6019970.0|2470.5249999999996|2605.8773809523814|60|50|67|51|91|74|98|59
+monastery-ecommerce|1.2078E7|5704000.0|1.2078E7|1.0893E7|2875.7142857142853|2875.7142857142853|34|14|34|19|51|18|51|39
+calzatodo-ecommerce|1.13345E7|7092700.0|1.19539E7|6052000.0|2698.6904761904757|2846.166666666666|65|44|70|35|68|45|73|36
+peopleplays-ecommerce|5.33153E7|4.175295E7|5.603445E7|5.22047E7|12694.119047619048|13341.535714285714|186|155|198|201|190|157|198|181
+lecoqsportif-ecommerce|1.28755E7|4774000.0|1.28755E7|9985000.0|3065.5952380952376|3065.5952380952376|39|16|39|30|34|14|34|28
+inbesasas-ecommerce|1.0494446E7|6787656.0|1.1600253E7|7922390.0|2498.677619047619|2761.965|11|9|13|12|13|12|15|14
+wolker-ecommerce|1.05235E7|6845500.0|1.19665E7|8539000.0|2505.5952380952376|2849.166666666666|35|23|40|28|31|23|35|26
+hangar-ecommerce|2.5687465E7|1.294463E7|2.5687465E7|6898350.0|6116.063095238096|6116.063095238096|26|10|26|12|26|10|26|11
+ventasenlineacorpsas-ecommerce|2968790.0|4388000.0|3348590.0|8009070.0|706.8547619047619|797.2833333333332|12|18|14|32|11|19|13|22
+pacificsportcolombia-ecommerce|1.775944E7|1.231956E7|1.91394E7|8879730.0|4228.438095238095|4557.0|54|41|58|26|54|41|58|27
+levis-ecommerce|1.143632E7|1.373356E7|1.462128E7|4709330.0|2722.933333333334|3481.2571428571423|55|51|64|24|78|70|97|32
+leonisa-ecommerce|9399810.0|6623320.0|1.056343E7|8822740.0|2238.05|2515.1023809523813|61|45|67|62|94|71|108|109
+kronotime-ecommerce|5.9083E7|5.54339E7|6.70011E7|4.72704E7|14067.380952380958|15952.642857142862|203|177|230|175|134|117|149|117
+labarcashop-ecommerce|8848500.0|1.18148E7|1.053E7|1.04551E7|2106.785714285714|2507.142857142857|25|31|29|35|25|31|29|35
+sportzone-ecommerce|6096900.0|4162500.0|7026200.0|7141300.0|1451.642857142857|1672.904761904762|30|22|35|35|27|25|33|35
+cassio2-ecommerce|1.48161E7|8166400.0|1.48161E7|7889650.0|3527.642857142857|3527.642857142857|12|6|12|12|13|6|13|11
+gef-ecommerce|5196370.0|4304460.0|5746310.0|8939840.0|1237.2309523809524|1368.1690476190477|46|42|50|80|50|43|56|101
+prochampions-ecommerce|8859010.0|6930875.0|9602750.0|9319255.0|2109.2880952380947|2286.3690476190473|49|31|54|51|48|39|52|52
+tiendasbranchos-ecommerce|4988200.0|5294300.0|5217200.0|4696600.0|1187.6666666666665|1242.1904761904761|21|20|22|21|20|21|21|23
+frutafresca-ecommerce|7532200.0|6091760.0|8352100.0|1.0183E7|1793.380952380952|1988.5952380952378|18|18|19|27|21|20|22|29
+maeskoshop-ecommerce|5721600.0|3982200.0|5871500.0|7760700.0|1362.2857142857142|1397.9761904761906|23|18|24|32|19|18|20|26
+pilatos-ecommerce|4532760.0|1389800.0|4532760.0|1425300.0|1079.2285714285713|1079.2285714285713|11|3|11|7|22|3|22|10`;
+// Listings ACTIVOS por aliado -- snapshot de CATÁLOGO VIGENTE a una fecha (NO ventas): cuenta sku_id cuyo período
+// de vigencia (start_date/end_date) cubre el corte, en dm_marketplace_sku_stock_period JOIN taxonomía por sku_id
+// (mismo método que T2_INVENTORY_RAW, Change 6). Deliberadamente NO se filtra por department_name de la tabla de
+// stock: un SELECT DISTINCT mostró que esa columna tiene SKUs de Moda (por taxonomía) etiquetados con otros
+// department_name (Belleza y salud, Deportes, etc.) y viceversa -- ruido cruzado, no es la misma taxonomía.
+// activos_cur sirve para semana Y mes porque el corte MTD (2026-11-08) coincide con el cierre de la semana actual.
+// [ally|activos_cur|activos_wprev|activos_mtdprev]
+const ALLY_LISTINGS_ACTIVE_RAW = `tennis-ecommerce|16128|15561|14529
+cassio2-ecommerce|2185|2185|2113
+hangar-ecommerce|1097|1097|1097
+tiendasbranchos-ecommerce|863|863|856
+kronotime-ecommerce|2364|2351|2308
+lecoqsportif-ecommerce|666|666|666
+calzatodo-ecommerce|6285|6285|6285
+ventasenlineacorpsas-ecommerce|548|547|536
+leonisa-ecommerce|9826|9805|8874
+inbesasas-ecommerce|1621|1609|1525
+pacificsportcolombia-ecommerce|9360|9056|6624
+labarcashop-ecommerce|4238|4202|3399
+gef-ecommerce|6669|6610|6390
+maeskoshop-ecommerce|185|185|172
+pilatos-ecommerce|15347|15334|14734
+monastery-ecommerce|3018|3011|2787
+peopleplays-ecommerce|12001|12001|11933
+mariohdz-ecommerce|3788|3781|3634
+totto-ecommerce|2123|1639|1598
+prochampions-ecommerce|4350|4335|3981
+frutafresca-ecommerce|14629|14542|13874
+bosi-ecommerce|6829|6823|6323
+sportzone-ecommerce|3780|3765|3277
+bata-ecommerce|4366|4366|4323
+levis-ecommerce|5408|5366|4413
+wolker-ecommerce|576|576|571
+cuerosvelez-ecommerce|11022|10906|10149`;
 const BIBLE_VINTAGE = "2026-11-08";
 
-// L2/L3 GMV opening, full category, last 30 days (2026-09-30..2026-10-29), REFRESCADO 2026-10-30. [l2, l3, gmv_cop, gmv_usd, orders, buyers, allies]
-const L2L3_SALES = [
-["Moda Hombre","Calzado",548393791.46,130569.95,2076,2006,73],
-["Bolsos y Equipaje","Mochilas",545866381.87,129968.19,2505,2455,78],
-["Relojes","Relojes de Pulsera",472443304.58,112486.5,1588,1527,51],
-["Moda Mujer","Calzado",461670936.9,109921.65,1978,1917,91],
-["Moda Hombre","Ropa",319902275.04,76167.21,1820,1723,123],
-["Bolsos y Equipaje","Equipaje",277457903.18,66061.41,1413,1374,55],
-["Moda Mujer","Ropa",260651559,62059.9,1765,1664,163],
-["Bolsos y Equipaje","Bolsos y Carteras",243389252,57949.82,1469,1436,64],
-["Bolsos y Equipaje","Billeteras y Monederos",190330378,45316.76,1687,1658,29],
-["Accesorios de Moda","Cinturones",60126990,14315.95,633,613,18],
-["Accesorios de Moda","Gorras y Sombreros",57331526,13650.36,467,460,48],
-["Joyería","Pulseras y Brazaletes",55109560,13121.32,315,306,29],
-["Joyería","Collares y Cadenas",52016706,12384.93,205,203,25],
-["Accesorios de Moda","Gafas de Sol",31529317.68,7506.98,127,127,32],
-["Joyería","Aretes",21381446,5090.82,174,167,23],
-["Dotación Laboral","Calzado de Seguridad",14116945,3361.18,64,64,8],
-["Otro",null,13251408,3155.1,117,116,27],
-["Joyería","Anillos",12023940.25,2862.84,79,78,13],
-["Joyería","Dijes",10560574,2514.42,64,64,16],
-["Bolsos y Equipaje","Maletines y Portafolios",6535310,1556.03,51,51,8],
-["Joyería","Piercings",4494200,1070.05,11,11,2],
-["Accesorios de Moda","Bufandas y Pañuelos",2368510,563.93,25,25,7],
-["Bolsos y Equipaje","Otro",2303899,548.55,40,40,6],
-["Relojes","Otro",1935660,460.87,18,17,12],
-["Moda Hombre","Otro",1729000,411.67,7,7,2],
-["Dotación Laboral","Uniformes",1709891,407.12,9,9,5],
-["Dotación Laboral","Otro",1620000,385.71,1,1,1],
-["Accesorios de Moda","Otro",1272240,302.91,14,14,7],
-["Joyería","Tobilleras",826180,196.71,9,8,7],
-["Accesorios de Moda","Guantes",814750,193.99,9,9,7],
-["Dotación Laboral","Accesorios de Protección",640470,152.49,8,8,7],
-["Joyería","Otro",622990,148.33,7,7,5],
-["Accesorios de Moda","Corbatas y Pajaritas",235000,55.95,2,2,1],
-["Relojes","Correas y Repuestos",181700,43.26,3,3,3],
-["Moda Mujer","Otro",80000,19.05,1,1,1]
-];
+// Ventanas vigentes de ALLY_PERIOD_RAW/L2L3_PERIOD_RAW (actualizar junto con esas queries en cada refresh):
+// semana cerrada lun-dom más reciente, MTD = 1 del mes al mismo corte, *_prev = período comparable (semana
+// previa completa / mismo número de días del mes anterior).
+const PERIOD_WINDOWS = {
+  wk: {from:'2026-11-02', to:'2026-11-08'}, wkPrev: {from:'2026-10-26', to:'2026-11-01'},
+  mtd: {from:'2026-11-01', to:'2026-11-08'}, mtdPrev: {from:'2026-10-01', to:'2026-10-08'},
+};
+function periodRangeLabel(p){ return `${+p.from.slice(8,10)}-${+p.to.slice(8,10)} ${monthEsLabel(p.to.slice(0,7))}`; }
+function periodMtdLabel(p){ return `1-${+p.to.slice(8,10)} ${monthEsLabel(p.to.slice(0,7))}`; }
+const ALLY_PERIOD = {};
+ALLY_PERIOD_RAW.trim().split('\n').forEach(line=>{
+  const [ally,gmv_w,gmv_wprev,gmv_mtd,gmv_mtdprev,gmvusd_w,gmvusd_mtd,orders_w,orders_wprev,orders_mtd,orders_mtdprev,lv_w,lv_wprev,lv_mtd,lv_mtdprev] = line.split('|');
+  ALLY_PERIOD[ally] = {gmv_w:+gmv_w, gmv_wprev:+gmv_wprev, gmv_mtd:+gmv_mtd, gmv_mtdprev:+gmv_mtdprev,
+    gmvusd_w:+gmvusd_w, gmvusd_mtd:+gmvusd_mtd, orders_w:+orders_w, orders_wprev:+orders_wprev,
+    orders_mtd:+orders_mtd, orders_mtdprev:+orders_mtdprev, lv_w:+lv_w, lv_wprev:+lv_wprev, lv_mtd:+lv_mtd, lv_mtdprev:+lv_mtdprev};
+});
+ALLY_LISTINGS_ACTIVE_RAW.trim().split('\n').forEach(line=>{
+  const [ally,cur,wprev,mtdprev] = line.split('|');
+  if(ALLY_PERIOD[ally]) Object.assign(ALLY_PERIOD[ally], {activos_cur:+cur, activos_wprev:+wprev, activos_mtdprev:+mtdprev});
+});
+
+// AGREGADO 2026-11-09 a pedido de Heidy: "Apertura por L2/L3" reconstruida con semana cerrada lun-dom + MTD
+// (actual y período comparable anterior), Share GMV recalculado contra el TOTAL de la categoría en ESE MISMO
+// período (no un snapshot fijo de 30 días), y Listings con venta / Listings activos. Misma fuente y mismas
+// ventanas que ALLY_PERIOD_RAW de arriba (ver su comentario) -- sin filtro de aliado, trae TODA la categoría.
+// l3 puede venir vacío ("Otro" sin subcategoría).
+// [l2|l3|gmv_w|gmv_wprev|gmv_mtd|gmv_mtdprev|gmvusd_w|gmvusd_mtd|orders_w|orders_wprev|orders_mtd|orders_mtdprev|lv_w|lv_wprev|lv_mtd|lv_mtdprev]
+const L2L3_PERIOD_RAW = `Moda Hombre|Calzado|1.84805985E8|1.38803979E8|2.02531565E8|1.2191709946E8|44001.424999999996|48221.801190476195|724|539|795|472|605|448|652|427
+Relojes|Relojes de Pulsera|1.4882384385E8|1.21232025E8|1.6202824385E8|1.104101E8|35434.24853571429|38578.15329761904|456|379|505|413|379|319|410|331
+Moda Mujer|Calzado|1.40038985E8|1.10074942E8|1.54720575E8|1.074927719E8|33342.61547619047|36838.23214285714|595|456|658|481|603|466|653|485
+Bolsos y Equipaje|Mochilas|9.9740093E7|1.2957683687E8|1.14535833E8|1.1975506E8|23747.641190476195|27270.43642857143|477|648|551|522|200|209|218|199
+Moda Hombre|Ropa|1.0087763837E8|8.169812E7|1.1028851737E8|7.971717399000001E7|24018.48532619048|26259.170802380948|507|458|564|452|654|591|729|541
+Bolsos y Equipaje|Equipaje|6.8041028E7|8.7480296E7|7.9325708E7|5.730062618E7|16200.24476190476|18887.073333333334|318|412|376|292|135|164|152|121
+Bolsos y Equipaje|Bolsos y Carteras|6.711198396E7|6.3688544980000004E7|7.732179894999999E7|6.0312513E7|15979.0438|18409.952130952388|366|404|426|350|189|192|207|162
+Moda Mujer|Ropa|6.6624201E7|6.3249946E7|7.61969E7|6.2314014E7|15862.904999999999|18142.119047619046|443|411|493|414|647|536|714|630
+Bolsos y Equipaje|Billeteras y Monederos|4.5807014E7|4.9271243E7|5.3109729E7|4.527263E7|10906.431904761906|12645.17357142857|400|458|465|390|209|176|227|152
+Accesorios de Moda|Cinturones|1.683184E7|1.4598326E7|1.8669015E7|1.624979E7|4007.5809523809535|4445.003571428571|168|162|188|172|142|122|153|118
+Joyería|Collares y Cadenas|1.8174281E7|8291282.0|1.8424171E7|1.3257253E7|4327.209761904762|4386.707380952381|70|36|72|60|79|34|80|49
+Joyería|Pulseras y Brazaletes|1.3656064E7|1.3291421E7|1.4420884E7|1.374448E7|3251.4438095238097|3433.543809523809|72|77|79|83|67|67|73|57
+Accesorios de Moda|Gorras y Sombreros|1.2697482E7|1.22165E7|1.4293762E7|1.712337E7|3023.21|3403.276666666667|121|129|141|122|93|107|108|117
+Accesorios de Moda|Gafas de Sol|1.2219107799999999E7|1.09587427E7|1.3574111049999999E7|6670920.35|2909.3113809523807|3231.931202380952|49|40|55|23|51|43|57|24
+Joyería|Aretes|7507020.0|5320089.0|8024010.0|5245496.0|1787.3857142857144|1910.4785714285715|63|33|66|48|73|46|75|43
+Joyería|Anillos|5892050.0|3306538.0|7417657.0|4144055.0|1402.8690476190475|1766.1088095238094|28|22|31|17|21|21|26|14
+Dotación Laboral|Calzado de Seguridad|3168662.0|3659110.0|4599102.0|3450518.0|754.4433333333332|1095.0242857142857|13|14|17|16|12|14|16|17
+Otro||3194760.0|3523125.0|3916380.0|2762418.0|760.6571428571427|932.4714285714284|27|33|35|23|14|16|19|13
+Joyería|Dijes|2489752.0|1333753.0|2489752.0|3745441.0|592.7980952380952|592.7980952380952|18|11|18|20|18|10|18|21
+Bolsos y Equipaje|Otro|818773.0|966400.0|1029073.0|642100.0|194.9459523809524|245.01738095238096|8|11|11|9|6|7|9|7
+Bolsos y Equipaje|Maletines y Portafolios|826944.0|1363700.0|944644.0|1438560.0|196.89142857142855|224.91523809523807|12|21|15|6|7|7|8|6
+Joyería|Otro|935970.0|187980.0|935970.0|25000.0|222.85|222.85|4|4|4|1|2|4|2|1
+Relojes|Otro|812480.0|470000.0|812480.0|494870.0|193.44761904761907|193.44761904761907|8|4|8|6|7|4|7|5
+Joyería|Piercings|606900.0|362000.0|606900.0|75600.0|144.5|144.5|3|2|3|1|4|6|4|1
+Accesorios de Moda|Guantes|408900.0|369400.0|429500.0|0.0|97.35714285714285|102.26190476190476|2|5|3|0|2|5|3|0
+Accesorios de Moda|Bufandas y Pañuelos|427850.0|683200.0|427850.0|629490.0|101.86904761904762|101.86904761904762|6|6|6|7|5|2|5|5
+Dotación Laboral|Uniformes|320000.0|150000.0|320000.0|594800.0|76.19047619047619|76.19047619047619|2|1|2|3|3|1|3|3
+Accesorios de Moda|Otro|150790.0|169950.0|150790.0|449900.0|35.90238095238095|35.90238095238095|2|2|2|4|2|2|2|3
+Moda Hombre|Otro|129900.0|539000.0|129900.0|340000.0|30.928571428571427|30.928571428571427|1|3|1|1|1|3|1|1
+Dotación Laboral|Accesorios de Protección|46900.0|116770.0|46900.0|30000.0|11.166666666666666|11.166666666666666|1|3|1|1|1|3|1|1
+Accesorios de Moda|Tirantes y Mancornas|0.0|39900.0|39900.0|50000.0|0.0|9.5|0|1|1|1|0|1|1|1
+Joyería|Tobilleras|34990.0|87000.0|34990.0|34990.0|8.33095238095238|8.33095238095238|1|1|1|1|1|1|1|1
+Relojes|Correas y Repuestos|0.0|269700.0|0.0|59900.0|0.0|0.0|0|2|0|1|0|2|0|1
+Moda Mujer|Otro|0.0|0.0|0.0|0.0|0.0|0.0|0|0|0|0|0|0|0|0
+Dotación Laboral|Otro|0.0|0.0|0.0|0.0|0.0|0.0|0|0|0|0|0|0|0|0
+Accesorios de Moda|Corbatas y Pajaritas|0.0|0.0|0.0|148000.0|0.0|0.0|0|0|0|1|0|0|0|1`;
+// Listings ACTIVOS por L2/L3 -- mismo método que ALLY_LISTINGS_ACTIVE_RAW (JOIN por sku_id a taxonomía, NO por
+// department_name de la tabla de stock), agrupado por l2/l3 en vez de por aliado, sin filtro de aliado.
+// [l2|l3|activos_cur|activos_wprev|activos_mtdprev]
+const L2L3_LISTINGS_ACTIVE_RAW = `Moda Mujer|Ropa|178345|173925|152393
+Moda Mujer|Calzado|112141|110943|99386
+Moda Hombre|Ropa|94102|92051|83594
+Moda Hombre|Calzado|59019|58268|51891
+Relojes|Relojes de Pulsera|24429|22679|14401
+Accesorios de Moda|Gafas de Sol|12898|12737|9268
+Bolsos y Equipaje|Bolsos y Carteras|10381|9620|8199
+Bolsos y Equipaje|Billeteras y Monederos|8100|7988|5124
+Bolsos y Equipaje|Equipaje|6786|6445|4162
+Joyería|Pulseras y Brazaletes|5990|5944|5099
+Accesorios de Moda|Gorras y Sombreros|5923|5198|4661
+Joyería|Collares y Cadenas|5459|5395|4669
+Bolsos y Equipaje|Mochilas|5453|5186|4492
+Joyería|Aretes|4695|4646|3913
+Accesorios de Moda|Cinturones|4235|4189|3835
+Joyería|Dijes|4006|3921|2838
+Joyería|Anillos|1943|1926|1648
+Otro||1757|1686|1336
+Joyería|Piercings|1032|1020|970
+Dotación Laboral|Calzado de Seguridad|911|910|773
+Accesorios de Moda|Bufandas y Pañuelos|812|779|651
+Relojes|Correas y Repuestos|635|573|552
+Dotación Laboral|Uniformes|583|556|406
+Joyería|Otro|424|413|360
+Accesorios de Moda|Guantes|346|284|251
+Bolsos y Equipaje|Maletines y Portafolios|309|259|235
+Dotación Laboral|Accesorios de Protección|250|227|147
+Joyería|Tobilleras|226|225|189
+Bolsos y Equipaje|Otro|225|216|197
+Relojes|Otro|204|188|185
+Accesorios de Moda|Otro|200|190|173
+Moda Hombre|Otro|150|148|99
+Accesorios de Moda|Tirantes y Mancornas|134|132|128
+Accesorios de Moda|Corbatas y Pajaritas|97|97|91
+Moda Mujer|Otro|18|18|18
+Dotación Laboral|Otro|13|13|13`;
+function parseL2L3Period(raw){
+  return raw.trim().split('\n').map(line=>{
+    const [l2,l3,gmv_w,gmv_wprev,gmv_mtd,gmv_mtdprev,gmvusd_w,gmvusd_mtd,orders_w,orders_wprev,orders_mtd,orders_mtdprev,lv_w,lv_wprev,lv_mtd,lv_mtdprev] = line.split('|');
+    return {l2, l3: l3||null, gmv_w:+gmv_w, gmv_wprev:+gmv_wprev, gmv_mtd:+gmv_mtd, gmv_mtdprev:+gmv_mtdprev,
+      gmvusd_w:+gmvusd_w, gmvusd_mtd:+gmvusd_mtd, orders_w:+orders_w, orders_wprev:+orders_wprev,
+      orders_mtd:+orders_mtd, orders_mtdprev:+orders_mtdprev, lv_w:+lv_w, lv_wprev:+lv_wprev, lv_mtd:+lv_mtd, lv_mtdprev:+lv_mtdprev};
+  });
+}
+const L2L3_PERIOD = parseL2L3Period(L2L3_PERIOD_RAW);
+const l2l3Key = r => r.l2+'|'+(r.l3||'');
+const L2L3_LISTINGS_BY_KEY = {};
+L2L3_LISTINGS_ACTIVE_RAW.trim().split('\n').forEach(line=>{
+  const [l2,l3,cur,wprev,mtdprev] = line.split('|');
+  L2L3_LISTINGS_BY_KEY[l2+'|'+(l3||'')] = {activos_cur:+cur, activos_wprev:+wprev, activos_mtdprev:+mtdprev};
+});
+L2L3_PERIOD.forEach(r=>{ const l = L2L3_LISTINGS_BY_KEY[l2l3Key(r)]; if(l) Object.assign(r, l); });
 
 // REFRESCADO 2026-10-30 (anchor 2026-10-29): days_since_last/days_since_first y el filtro bucket recalculados con
 // cap CAST(origination_date_local AS DATE) <= '2026-10-29' (evita que una venta de "hoy" se cuele). Query: GMV/orders/
@@ -4162,26 +4272,64 @@ document.getElementById('topMeta').innerHTML = `
   <span>Vintage <b>${BIBLE_VINTAGE}</b></span>
   <span>Data hasta <b>${D_GMV.latest}</b></span>`;
 
-/* ---------- L2/L3 opening ---------- */
-(function(){
-  const rows = [...L2L3_SALES].sort((a,b)=>b[2]-a[2]);
-  const byL2 = {};
-  rows.forEach(([l2,l3,gmvCop,gmvUsd,orders,buyers,allies])=>{
-    if(!byL2[l2]) byL2[l2]={l2, gmvCop:0, gmvUsd:0, orders:0, buyers:0, allies:0};
-    const b=byL2[l2]; b.gmvCop+=gmvCop; b.gmvUsd+=gmvUsd; b.orders+=orders; b.buyers+=buyers; b.allies=Math.max(b.allies,allies);
-  });
-  const l2Rows = Object.values(byL2).sort((a,b)=>b.gmvCop-a.gmvCop);
-  const maxGmv = l2Rows[0].gmvCop;
-  const head = `<thead><tr><th>L2</th><th>GMV</th><th>Share GMV</th><th>Orders</th><th>Buyers</th><th>Aliados</th></tr></thead>`;
-  const body = l2Rows.map(b=>{
-    const barw = b.gmvCop/maxGmv*100;
-    return `<tr><td class="name">${l2Label(b.l2)}</td>
-      <td><div class="barcell"><span>${usd(b.gmvUsd)}</span><div class="minibar"><i style="width:${barw}%;background:var(--accent)"></i></div></div></td>
-      <td>${pct(b.gmvCop/CATEGORY_GMV_30D_COP,1)}</td>
-      <td>${int(b.orders)}</td><td>${int(b.buyers)}</td><td>${b.allies}</td></tr>`;
+/* ---------- L2/L3 opening (AGREGADO 2026-11-09: toggles L2/L3 y Weekly/Monthly) ---------- */
+let l2l3Level = 'L2', l2l3Freq = 'weekly';
+function renderL2L3Table(level=l2l3Level, freq=l2l3Freq){
+  l2l3Level = level; l2l3Freq = freq;
+  const isWeekly = freq==='weekly';
+  let rows;
+  if(level==='L3'){
+    rows = L2L3_PERIOD.map(r=>({label: r.l3? `${l2Label(r.l2)} / ${esc(r.l3)}` : l2Label(r.l2), ...r}));
+  } else {
+    const byL2 = {};
+    const sumKeys = ['gmv_w','gmv_wprev','gmv_mtd','gmv_mtdprev','gmvusd_w','gmvusd_mtd','orders_w','orders_wprev',
+      'orders_mtd','orders_mtdprev','lv_w','lv_wprev','lv_mtd','lv_mtdprev','activos_cur','activos_wprev','activos_mtdprev'];
+    L2L3_PERIOD.forEach(r=>{
+      if(!byL2[r.l2]){ byL2[r.l2] = {l2:r.l2}; sumKeys.forEach(k=>byL2[r.l2][k]=0); }
+      const b = byL2[r.l2];
+      // "Listings con venta/activos" SÍ se puede sumar entre L3 de un mismo L2 sin sobre-contar: un SKU pertenece
+      // a un solo l3 (taxonomía jerárquica no solapada), así que no hay doble conteo al agregar al nivel L2.
+      sumKeys.forEach(k=>b[k]+=(r[k]||0));
+    });
+    rows = Object.values(byL2).map(b=>({label:l2Label(b.l2), ...b}));
+  }
+  const totalCur = rows.reduce((s,r)=>s+(isWeekly?r.gmv_w:r.gmv_mtd),0);
+  rows.sort((a,b)=> isWeekly? b.gmv_w-a.gmv_w : b.gmv_mtd-a.gmv_mtd);
+  const maxGmv = Math.max(1, ...rows.map(r=>isWeekly?r.gmv_w:r.gmv_mtd));
+  const gmvLbl = isWeekly? `GMV semana (${periodRangeLabel(PERIOD_WINDOWS.wk)})` : `GMV MTD (${periodMtdLabel(PERIOD_WINDOWS.mtd)})`;
+  const deltaLbl = isWeekly? 'Δ WoW' : 'Δ MoM';
+  const head = `<thead><tr><th>${level}</th><th>${gmvLbl}</th><th>Share GMV</th><th>${deltaLbl}</th><th>Órdenes</th>
+    <th>Listings con venta</th><th>${deltaLbl}</th><th>Listings activos</th><th>${deltaLbl}</th></tr></thead>`;
+  const body = rows.map(r=>{
+    const gmvCur = isWeekly?r.gmv_w:r.gmv_mtd, gmvPrev = isWeekly?r.gmv_wprev:r.gmv_mtdprev;
+    const gmvUsd = isWeekly?r.gmvusd_w:r.gmvusd_mtd;
+    const ordCur = isWeekly?r.orders_w:r.orders_mtd;
+    const lvCur = isWeekly?r.lv_w:r.lv_mtd, lvPrev = isWeekly?r.lv_wprev:r.lv_mtdprev;
+    const actCur = r.activos_cur, actPrev = isWeekly?r.activos_wprev:r.activos_mtdprev;
+    const dGmv = gmvPrev? (gmvCur-gmvPrev)/gmvPrev : null;
+    const dLv = lvPrev? (lvCur-lvPrev)/lvPrev : null;
+    const dAct = actPrev? (actCur-actPrev)/actPrev : null;
+    const barw = gmvCur/maxGmv*100;
+    return `<tr><td class="name">${r.label}</td>
+      <td><div class="barcell"><span>${usd(gmvUsd)}</span><div class="minibar"><i style="width:${barw}%;background:var(--accent)"></i></div></div></td>
+      <td>${pct(totalCur? gmvCur/totalCur : null,1)}</td><td>${chip(dGmv)}</td>
+      <td>${int(ordCur)}</td>
+      <td>${int(lvCur)}</td><td>${chip(dLv)}</td>
+      <td>${int(actCur)}</td><td>${chip(dAct)}</td></tr>`;
   }).join('');
   document.getElementById('l2l3Table').innerHTML = head+`<tbody>${body}</tbody>`;
-})();
+}
+renderL2L3Table();
+document.getElementById('l2l3LevelToggle').addEventListener('click', e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#l2l3LevelToggle button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  renderL2L3Table(b.dataset.lvl, l2l3Freq);
+});
+document.getElementById('l2l3FreqToggle').addEventListener('click', e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#l2l3FreqToggle button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  renderL2L3Table(l2l3Level, b.dataset.f);
+});
 
 /* ---------- Ally lifecycle detail lists (solo aliados donde Moda es >=60% de su GMV) ---------- */
 (function(){
@@ -5033,28 +5181,58 @@ document.getElementById('freqToggle').addEventListener('click', e=>{
 renderMetricGrid(chartState.freq);
 
 /* ============================================================= ALLY TABLE (TAB 1) ============================================================= */
-function renderAllyTable(filter=''){
-  const rows = ALLIES.filter(a=>a[0].toLowerCase().includes(filter.toLowerCase()));
+// AGREGADO 2026-11-09 a pedido de Heidy: reconstruida sobre ALLY_PERIOD (ver su comentario más arriba) con
+// toggle Weekly/Monthly -- reemplaza la vista fija "7d + MTD" simultánea por una sola vista por vez, con
+// encabezados dinámicos que muestran el rango de fechas exacto. Universo = T2_ALLIES (27, roster fijo, ya NO
+// un ranking "Top 25" -- se reordena por GMV del período activo en el toggle).
+let allyTableFreq = 'weekly';
+function renderAllyTable(filter='', freq=allyTableFreq){
+  allyTableFreq = freq;
+  const isWeekly = freq==='weekly';
+  const rows = T2_ALLIES.filter(a=>a.toLowerCase().includes(filter.toLowerCase()))
+    .map(a=>({a, d: ALLY_PERIOD[a]})).filter(r=>r.d)
+    .sort((x,y)=> isWeekly ? y.d.gmv_w-x.d.gmv_w : y.d.gmv_mtd-x.d.gmv_mtd);
+  const gmvLbl = isWeekly ? `GMV semana (${periodRangeLabel(PERIOD_WINDOWS.wk)})` : `GMV MTD (${periodMtdLabel(PERIOD_WINDOWS.mtd)})`;
+  const ordLbl = isWeekly ? 'Órdenes semana' : 'Órdenes MTD';
+  const lvLbl = isWeekly ? 'Listings con venta' : 'Listings con venta MTD';
+  const deltaLbl = isWeekly ? 'Δ WoW' : 'Δ MoM';
   const head = `<thead><tr>
-    <th>Aliado</th><th>Cluster</th><th>GMV 7d</th><th>Δ vs 7d prev</th><th>Orders 7d</th><th>Δ orders</th>
-    <th>GMV MTD</th><th>Δ vs mismo tramo mes ant.</th></tr></thead>`;
-  const body = rows.map(([slug,cluster,g7,gp7,gmtd,glm,o7,op7])=>{
-    const dGmv=(g7-gp7)/gp7, dOrd=op7? (o7-op7)/op7 : null, dMtd= glm>0 ? (gmtd-glm)/glm : null;
-    return `<tr><td class="name">${esc(slug)}</td><td>${clusterPill(cluster)}</td>
-      <td>${usd(g7/4300)}</td><td>${chip(dGmv)}</td>
-      <td>${int(o7)}</td><td>${chip(dOrd)}</td>
-      <td>${usd(gmtd/4300)}</td><td>${dMtd==null?'<span class="chip flat">nuevo</span>':chip(dMtd)}</td></tr>`;
+    <th>Aliado</th><th>Cluster</th><th>${gmvLbl}</th><th>${deltaLbl}</th><th>${ordLbl}</th><th>${deltaLbl}</th>
+    <th>${lvLbl}</th><th>${deltaLbl}</th><th>Listings activos</th><th>${deltaLbl}</th></tr></thead>`;
+  const body = rows.map(({a,d})=>{
+    const gmvCur = isWeekly?d.gmv_w:d.gmv_mtd, gmvPrev = isWeekly?d.gmv_wprev:d.gmv_mtdprev;
+    const gmvUsd = isWeekly?d.gmvusd_w:d.gmvusd_mtd;
+    const ordCur = isWeekly?d.orders_w:d.orders_mtd, ordPrev = isWeekly?d.orders_wprev:d.orders_mtdprev;
+    const lvCur = isWeekly?d.lv_w:d.lv_mtd, lvPrev = isWeekly?d.lv_wprev:d.lv_mtdprev;
+    const actCur = d.activos_cur, actPrev = isWeekly?d.activos_wprev:d.activos_mtdprev;
+    const dGmv = gmvPrev? (gmvCur-gmvPrev)/gmvPrev : null;
+    const dOrd = ordPrev? (ordCur-ordPrev)/ordPrev : null;
+    const dLv = lvPrev? (lvCur-lvPrev)/lvPrev : null;
+    const dAct = actPrev? (actCur-actPrev)/actPrev : null;
+    return `<tr><td class="name">${esc(a)}</td><td>${clusterPill(T2_CLUSTER[a])}</td>
+      <td>${usd(gmvUsd)}</td><td>${chip(dGmv)}</td>
+      <td>${int(ordCur)}</td><td>${chip(dOrd)}</td>
+      <td>${int(lvCur)}</td><td>${chip(dLv)}</td>
+      <td>${int(actCur)}</td><td>${chip(dAct)}</td></tr>`;
   }).join('');
   document.getElementById('allyTable').innerHTML = head+`<tbody>${body}</tbody>`;
 }
-renderAllyTable();
-document.getElementById('allySearch').addEventListener('input', e=>renderAllyTable(e.target.value));
 
 /* ============================================================= ALLY DEEP-DIVE (TAB 2) — DATA ============================================================= */
-// Universo: Top 25 GMV (ALLIES) + 2 aliados con meta Q4 individual que no estaban en el Top 25.
+// Universo histórico: originalmente Top 25 GMV + 2 aliados con meta Q4 individual que no estaban en el Top 25
+// (la tabla "Top 25" de tab 1 ya no existe como tal desde el 2026-11-09 -- ver renderAllyTable arriba -- pero
+// T2_ALLIES se mantiene igual, es el roster fijo de Ally Deep-Dive).
 const T2_ALLIES = ['cuerosvelez-ecommerce','totto-ecommerce','kronotime-ecommerce','peopleplays-ecommerce','mariohdz-ecommerce','bata-ecommerce','pacificsportcolombia-ecommerce','bosi-ecommerce','lecoqsportif-ecommerce','labarcashop-ecommerce','monastery-ecommerce','leonisa-ecommerce','prochampions-ecommerce','frutafresca-ecommerce','hangar-ecommerce','wolker-ecommerce','gef-ecommerce','cassio2-ecommerce','levis-ecommerce','tennis-ecommerce','sportzone-ecommerce','ventasenlineacorpsas-ecommerce','inbesasas-ecommerce','calzatodo-ecommerce','maeskoshop-ecommerce','pilatos-ecommerce','tiendasbranchos-ecommerce'];
 // cluster via ally_cluster (dm_originations_marketplace_master_table_by_suborder) -- mismo valor que ya usa la tabla Top 25 de tab 1.
 const T2_CLUSTER = {'cuerosvelez-ecommerce':'KA','totto-ecommerce':'KA','kronotime-ecommerce':'KA','mariohdz-ecommerce':'KA','bata-ecommerce':'KA','bosi-ecommerce':'KA','lecoqsportif-ecommerce':'KA','labarcashop-ecommerce':'MB','monastery-ecommerce':'MB','leonisa-ecommerce':'KA','frutafresca-ecommerce':'MB','hangar-ecommerce':'SMB','gef-ecommerce':'KA','cassio2-ecommerce':'SMB','levis-ecommerce':'KA','tennis-ecommerce':'KA','inbesasas-ecommerce':'SMB','calzatodo-ecommerce':'KA','pilatos-ecommerce':'KA','tiendasbranchos-ecommerce':'KA'};
+renderAllyTable();
+document.getElementById('allySearch').addEventListener('input', e=>renderAllyTable(e.target.value, allyTableFreq));
+document.getElementById('allyFreqToggle').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#allyFreqToggle button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  renderAllyTable(document.getElementById('allySearch').value, b.dataset.f);
+});
 
 // GMV 7d/MTD -- AJUSTADO 2026-11-03 (misma extensión del cambio de GMV pedido por Heidy, ver callout ✅ del Anexo):
 // ahora sale de dm_originations_marketplace_master_table_by_suborder (SUM(suborder_amount_cop), bruto, sin excluir
