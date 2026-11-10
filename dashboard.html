@@ -4828,6 +4828,12 @@ function isoWeekStart(dateStr){
 const evoState = { gran: 'weekly' };
 
 /* ---------- Visitas y conversión (Demanda) -- Fuente: Amplitude SELECT_PRODUCT / SELECT_ADD_TO_CART, departmentName IN ('Moda mujer','Moda hombre') ---------- */
+// AGREGADO 2026-11-09 a pedido de Heidy: antes esta gráfica usaba el histórico LARGO de Visitas/Tasa ATC (83
+// semanas desde 2025-03-24) y dejaba "Conversión a orden" en null para casi todo ese rango (solo tiene dato real
+// desde que arranca DAILY/Órdenes, 2026-07-02) -- la serie de conversión quedaba comprimida en una esquina,
+// casi invisible. Se recorta el eje de X de ESTA gráfica (daily/weekly/monthly) a la ventana donde las TRES
+// series tienen dato real, para que se vea la serie completa de conversión en vez de un garabato al final.
+const CONV_HISTORY_START = DAILY[0][0]; // 2026-07-02, primer día real de Órdenes
 function renderDemandChart(granularity){
   let dates, visitas, cvr, lastIdx, srcNote;
   if(granularity==='daily'){
@@ -4835,16 +4841,19 @@ function renderDemandChart(granularity){
     dates = d.map(r=>r[0]); visitas = d.map(r=>r[1]); cvr = d.map(r=>r[1]? r[2]/r[1]*100 : null);
     lastIdx = dates.length-1; srcNote = 'diario · Amplitude, igual fuente que la vista semanal';
   } else if(granularity==='monthly'){
-    const mVisitas = rollupToMonthly(WEEKLY_TRAFFIC_AMP.map(r=>[r[0],r[1]]));
+    const monthCutoff = monthKeyFromDate(CONV_HISTORY_START);
+    const mVisitas = rollupToMonthly(WEEKLY_TRAFFIC_AMP.map(r=>[r[0],r[1]])).filter(r=>r[0]>=monthCutoff);
     const mRatio = rollupRatioToMonthly(WEEKLY_TRAFFIC_AMP.map(r=>[r[0],r[2],r[1]]));
     const cvrByDate = Object.fromEntries(mRatio.map(r=>[r[0], r[1]*100]));
     dates = mVisitas.map(r=>r[0]); visitas = mVisitas.map(r=>r[1]); cvr = dates.map(d2=>cvrByDate[d2]??null);
-    lastIdx = dates.length-1; srcNote = 'mensual · empalmado del semanal (igual criterio que GMV/Órdenes mensual)';
+    lastIdx = dates.length-1; srcNote = 'mensual · empalmado del semanal (igual criterio que GMV/Órdenes mensual) · recortado a la ventana con dato real de conversión';
   } else {
-    dates = WEEKLY_TRAFFIC_AMP.map(r=>r[0]); visitas = WEEKLY_TRAFFIC_AMP.map(r=>r[1]);
-    cvr = WEEKLY_TRAFFIC_AMP.map(r=>r[1]? r[2]/r[1]*100 : null);
+    const weekCutoff = isoWeekStart(CONV_HISTORY_START);
+    const wkRows = WEEKLY_TRAFFIC_AMP.filter(r=>r[0]>=weekCutoff);
+    dates = wkRows.map(r=>r[0]); visitas = wkRows.map(r=>r[1]);
+    cvr = wkRows.map(r=>r[1]? r[2]/r[1]*100 : null);
     lastIdx = 0; dates.forEach((d0,i)=>{ if(addDaysStr(d0,6)<=LAST_DAILY_DATE) lastIdx=i; });
-    srcNote = `semanal · Amplitude, departmentName IN ('Moda mujer','Moda hombre')`;
+    srcNote = `semanal · Amplitude, departmentName IN ('Moda mujer','Moda hombre') · recortado a la ventana con dato real de conversión (antes de ${weekCutoff} solo hay Visitas/Tasa ATC, ver Anexo)`;
   }
   const lastV = visitas[lastIdx], lastC = cvr[lastIdx];
   const conv = conversionSeriesAligned(dates, granularity);
